@@ -4,13 +4,13 @@
    ========================================================================== */
 
 :root {
-  --paper: #f3f1ec;
-  --paper-2: #e9e6df;
+  --paper: #eeefec;
+  --paper-2: #e2e3df;
   --ink: #111110;
   --ink-2: #5d5b56;
   --ink-3: #9a978f;
   --line: rgba(17, 17, 16, .14);
-  --signal: #ff4a1c;
+  --signal: #2b3dff;
 
   --sans: "Inter Tight", system-ui, -apple-system, "Segoe UI", sans-serif;
   --serif: "Instrument Serif", "Times New Roman", serif;
@@ -25,12 +25,12 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --paper: #0f0f0e; --paper-2: #1a1a18; --ink: #efece5; --ink-2: #a9a59c; --ink-3: #6f6c65;
-    --line: rgba(239, 236, 229, .14); color-scheme: dark;
+    --line: rgba(239, 236, 229, .14); --signal: #8a96ff; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --paper: #0f0f0e; --paper-2: #1a1a18; --ink: #efece5; --ink-2: #a9a59c; --ink-3: #6f6c65;
-  --line: rgba(239, 236, 229, .14); color-scheme: dark;
+  --line: rgba(239, 236, 229, .14); --signal: #8a96ff; color-scheme: dark;
 }
 
 *, *::before, *::after { box-sizing: border-box; }

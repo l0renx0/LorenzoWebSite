@@ -86,7 +86,7 @@ html = f"""<!doctype html>
 <title>Lorenzo Devicienti — Photo, graphics, video & web</title>
 <meta name="description" content="Lorenzo Devicienti: photography, graphic design, video editing and websites, based in Barcelona.">
 <meta name="robots" content="noindex">
-<meta name="theme-color" content="#f3f1ec" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#eeefec" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0f0f0e" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="../assets/img/favicon.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
