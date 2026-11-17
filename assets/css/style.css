@@ -1,0 +1,336 @@
+/* ==========================================================================
+   Lorenzo Devicienti — Portfolio
+   Un solo foglio di stile per tutto il sito.
+   Colori e misure principali sono in :root, così si cambiano in un punto solo.
+   ========================================================================== */
+
+:root {
+  --black: #000;
+  --ink: #111;
+  --white: #fff;
+  --muted: #969696;      /* testo grigio "secondario" */
+  --label: #666;         /* etichette piccole */
+  --line: #ececec;       /* bordi e separatori */
+  --pill: #f0f0f0;       /* sfondo bottoni a pillola */
+  --card: #b4b4b4;       /* grigio delle card progetto */
+
+  --font: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-nav: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --page: 1280px;        /* larghezza massima del contenuto */
+  --gutter: 80px;        /* margine laterale su desktop */
+  --radius: 20px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body {
+  margin: 0;
+  background: var(--white);
+  color: var(--black);
+  font-family: var(--font);
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+}
+
+img { display: block; max-width: 100%; height: auto; }
+a { color: inherit; text-decoration: none; }
+h1, h2, h3, p, ul { margin: 0; }
+h1, h2, h3 { font-weight: 500; }
+ul { padding: 0; list-style: none; }
+
+.muted { color: var(--muted); }
+.label { font-size: 16px; line-height: 1.4; }
+.label--grey { color: var(--label); }
+
+.skip-link {
+  position: absolute; left: 16px; top: -60px; z-index: 100;
+  background: var(--black); color: var(--white); padding: 10px 16px; border-radius: 100px;
+}
+.skip-link:focus { top: 12px; }
+
+:focus-visible { outline: 2px solid var(--black); outline-offset: 3px; }
+
+/* --------------------------------------------------------------------------
+   Contenitori
+   -------------------------------------------------------------------------- */
+.wrap { width: 100%; max-width: calc(var(--page) + var(--gutter) * 2); margin: 0 auto; padding: 0 var(--gutter); }
+.wrap--1100 { max-width: calc(1100px + var(--gutter) * 2); }
+.wrap--940  { max-width: calc(940px + var(--gutter) * 2); }
+.wrap--800  { max-width: calc(800px + var(--gutter) * 2); }
+
+.section { padding: 120px 0; }
+.page-top { padding-top: 160px; }
+
+/* --------------------------------------------------------------------------
+   Testata
+   -------------------------------------------------------------------------- */
+.site-header {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(255, 255, 255, .92);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+}
+.site-header__inner {
+  max-width: 1120px; margin: 0 auto; height: 63px;
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
+  border-bottom: 1px solid var(--line);
+}
+.site-header__brand { font-family: var(--font-nav); font-weight: 800; font-size: 18px; letter-spacing: -.01em; color: var(--ink); }
+.site-nav ul { display: flex; gap: 20px; }
+.site-nav a {
+  font-family: var(--font-nav); font-size: 13px; font-weight: 500; letter-spacing: -.015em;
+  line-height: 26px; transition: opacity .2s;
+}
+.site-nav a:hover { opacity: .55; }
+.site-nav a[aria-current="page"] { text-decoration: underline; text-underline-offset: 5px; }
+.site-nav .only-mobile { display: none; }
+
+/* --------------------------------------------------------------------------
+   Bottoni a pillola
+   -------------------------------------------------------------------------- */
+.pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 22px; border-radius: 100px;
+  background: var(--pill); color: var(--black);
+  font-size: 18px; line-height: 1.4; white-space: nowrap;
+  transition: background .2s, transform .2s;
+}
+.pill:hover { background: #e2e2e2; }
+.pill--light { background: var(--white); }
+.pill--light:hover { background: #e9e9e9; }
+.arrow { width: 14px; height: 14px; flex: none; }
+
+/* --------------------------------------------------------------------------
+   Home — citazione
+   -------------------------------------------------------------------------- */
+.hero { text-align: center; padding: 160px 0 0; }
+.hero__quote { font-size: 70px; line-height: 1.2; letter-spacing: -.01em; margin: 72px auto 0; max-width: 1200px; text-wrap: balance; }
+.hero__author { margin-top: 32px; font-size: 16px; }
+
+/* --------------------------------------------------------------------------
+   Home — card progetti
+   -------------------------------------------------------------------------- */
+.projects { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; padding-top: 150px; }
+.project { display: block; }
+.project--wide { grid-column: 1 / -1; }
+.project__media {
+  position: relative; overflow: hidden; border-radius: var(--radius); background: var(--card);
+  aspect-ratio: 620 / 509;
+}
+.project--wide .project__media { aspect-ratio: 1280 / 509; }
+.project--hero .project__media { aspect-ratio: 1280 / 709; }
+.project__media img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s cubic-bezier(.2,.7,.2,1); }
+.project:hover .project__media img { transform: scale(1.03); }
+.project__badge {
+  position: absolute; left: 24px; bottom: 24px; width: 40px; height: 40px; border-radius: 50%;
+  display: grid; place-items: center; background: rgba(255,255,255,.25); color: var(--white);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); transition: background .2s, color .2s;
+}
+.project:hover .project__badge { background: var(--white); color: var(--black); }
+.project__meta { margin-top: 20px; }
+.project__kicker { color: var(--label); font-size: 18px; }
+.project__title { font-size: 24px; line-height: 1.4; }
+
+/* --------------------------------------------------------------------------
+   Riga "etichetta | testo grande | bottone"
+   -------------------------------------------------------------------------- */
+.statement {
+  display: grid; grid-template-columns: 272px 1fr auto; gap: 0 40px; align-items: start;
+}
+.statement__text { font-size: 40px; line-height: 1.4; max-width: 820px; }
+.statement .label { padding-top: 12px; }
+.statement--narrow { grid-template-columns: 118px 1fr auto; }
+.statement--narrow .statement__text { max-width: 600px; }
+
+/* --------------------------------------------------------------------------
+   Servizi (fisarmonica)
+   -------------------------------------------------------------------------- */
+.services__list { margin-top: 24px; }
+.service { border-bottom: 1px solid var(--line); }
+.service summary {
+  list-style: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
+  padding: 20px 0; font-size: 40px; line-height: 1.4;
+}
+.service summary::-webkit-details-marker { display: none; }
+.service summary svg { width: 24px; height: 24px; flex: none; transition: transform .3s; }
+.service[open] summary svg { transform: rotate(180deg); }
+.service ul { padding: 0 0 24px; }
+.service li { font-size: 24px; line-height: 1.4; padding: 8px 0; color: var(--label); }
+
+/* --------------------------------------------------------------------------
+   Pagine interne — titoli e paragrafi
+   -------------------------------------------------------------------------- */
+.title-xl { font-size: 64px; line-height: 1.2; letter-spacing: -.01em; }
+.lead { font-size: 32px; line-height: 1.4; }
+.lead + .lead { margin-top: 40px; }
+.title-xl + .lead, .label + .title-xl { margin-top: 24px; }
+.body-l { font-size: 24px; line-height: 1.4; }
+.body-l + .body-l { margin-top: 24px; }
+.stack > * + * { margin-top: 32px; }
+
+/* Immagine singola arrotondata (es. foto AI nella pagina About) */
+.figure { border-radius: 30px; overflow: hidden; }
+.figure img { width: 100%; height: auto; }
+
+/* Riquadro grigio con immagine (pagina Video) */
+.frame { border-radius: 30px; overflow: hidden; background: var(--card); }
+.frame img { width: 100%; height: 100%; object-fit: cover; }
+
+/* Testo + bottone affiancati */
+.text-cta { display: grid; grid-template-columns: 1fr auto; gap: 40px; align-items: start; }
+.text-cta .body-l { max-width: 1100px; }
+
+/* --------------------------------------------------------------------------
+   Nastro che scorre da solo (About, Graphics)
+   -------------------------------------------------------------------------- */
+.ticker { overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); }
+.ticker__track { display: flex; gap: 20px; width: max-content; animation: ticker var(--duration, 40s) linear infinite; }
+.ticker:hover .ticker__track { animation-play-state: paused; }
+.ticker__track img { height: var(--h, 400px); width: auto; border-radius: var(--radius); flex: none; }
+@keyframes ticker { to { transform: translateX(calc(-50% - 10px)); } }
+@media (prefers-reduced-motion: reduce) {
+  .ticker { overflow-x: auto; }
+  .ticker__track { animation: none; }
+  .ticker__track [aria-hidden="true"] { display: none; }
+}
+
+/* --------------------------------------------------------------------------
+   Carosello con frecce (Photo, Web Site)
+   -------------------------------------------------------------------------- */
+.carousel { position: relative; }
+.carousel__track {
+  display: flex; gap: 30px; overflow-x: auto; scroll-snap-type: x mandatory;
+  scrollbar-width: none; -webkit-overflow-scrolling: touch;
+}
+.carousel__track::-webkit-scrollbar { display: none; }
+.carousel__track > * { scroll-snap-align: start; flex: none; }
+.carousel--photos .carousel__track img {
+  width: calc((100% - 60px) / 3); aspect-ratio: 294 / 606; object-fit: cover; border-radius: var(--radius);
+}
+.carousel__btn {
+  position: absolute; top: 50%; transform: translateY(-50%); z-index: 2;
+  width: 40px; height: 40px; border-radius: 50%; border: 0; cursor: pointer;
+  display: grid; place-items: center;
+  background: rgba(255,255,255,.35); color: var(--white);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); transition: background .2s, color .2s;
+}
+.carousel__btn:hover { background: var(--white); color: var(--black); }
+.carousel__btn--prev { left: 16px; }
+.carousel__btn--next { right: 16px; }
+.carousel__btn svg { width: 16px; height: 16px; }
+
+/* Schermate dei siti web */
+.sites {
+  display: grid; grid-auto-flow: column; grid-auto-columns: min(540px, 82%); gap: 24px;
+  overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 12px;
+  margin-right: calc(var(--gutter) * -1); padding-right: var(--gutter);
+}
+.sites > * { scroll-snap-align: start; }
+.site-shot { border-radius: 16px; background: #f4f4f4; padding: 12px; }
+.site-shot img { border-radius: 8px; width: 100%; aspect-ratio: 16 / 9.13; object-fit: cover; object-position: top; }
+.site-shot__links { display: flex; justify-content: center; margin-top: 24px; }
+
+/* --------------------------------------------------------------------------
+   Contatti
+   -------------------------------------------------------------------------- */
+.contact { display: grid; grid-template-columns: 1fr 300px; gap: 40px; align-items: end; padding-bottom: 80px; }
+.contact__intro p + p { margin-top: 32px; }
+.contact__details { margin-top: 64px; display: grid; gap: 40px; max-width: 400px; }
+.contact__details dt { color: var(--label); font-size: 16px; }
+.contact__details dd { margin: 12px 0 0; }
+.link-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 6px 0; transition: opacity .2s; }
+.link-row:hover { opacity: .55; }
+
+/* --------------------------------------------------------------------------
+   Piè di pagina
+   -------------------------------------------------------------------------- */
+.site-footer { background: var(--black); color: var(--white); padding: 120px 0 72px; margin-top: 120px; }
+.site-footer__grid { display: grid; grid-template-columns: 1fr 232px 208px; gap: 40px; }
+.site-footer__title { font-size: 64px; line-height: 1.2; margin: 24px 0 48px; max-width: 550px; }
+.site-footer__nav li a { display: inline-block; padding: 4px 0; transition: opacity .2s; }
+.site-footer__nav li a:hover { opacity: .55; }
+.site-footer__social .link-row { padding: 4px 0; }
+.site-footer__copy { margin-top: 220px; font-size: 16px; color: #8a8a8a; }
+.site-footer--plain { background: none; color: var(--black); padding: 40px 0 72px; margin-top: 0; }
+.site-footer--plain .site-footer__copy { margin-top: 0; color: var(--black); }
+
+/* --------------------------------------------------------------------------
+   Comparsa morbida allo scroll (solo se JS attivo e movimento consentito)
+   -------------------------------------------------------------------------- */
+.js .reveal { opacity: 0; transform: translateY(24px); transition: opacity .8s ease, transform .8s cubic-bezier(.2,.7,.2,1); }
+.js .reveal.is-visible { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .js .reveal { opacity: 1; transform: none; transition: none; } }
+
+/* ==========================================================================
+   Tablet
+   ========================================================================== */
+@media (max-width: 1099px) {
+  :root { --gutter: 40px; }
+  .site-header__inner { margin: 0 var(--gutter); }
+  .hero__quote { font-size: 56px; }
+  .title-xl, .site-footer__title { font-size: 52px; }
+  .lead { font-size: 28px; }
+  .statement__text { font-size: 34px; }
+  .statement, .statement--narrow { grid-template-columns: 1fr auto; }
+  .statement .label { grid-column: 1 / -1; padding: 0 0 16px; }
+  .site-footer__grid { grid-template-columns: 1fr 1fr; }
+  .site-footer__grid > :first-child { grid-column: 1 / -1; }
+  .contact { grid-template-columns: 1fr; }
+}
+
+/* ==========================================================================
+   Telefono
+   ========================================================================== */
+@media (max-width: 767px) {
+  :root { --gutter: 16px; --radius: 16px; }
+  body { font-size: 16px; }
+
+  .site-header { position: sticky; background: var(--black); color: var(--white); }
+  .site-header__inner { flex-direction: column; justify-content: center; height: auto; gap: 8px; padding: 10px 0; margin: 0 var(--gutter); border: 0; }
+  .site-header__brand { color: var(--white); font-size: 16px; }
+  .site-nav ul { gap: 4px 16px; flex-wrap: wrap; justify-content: center; }
+  .site-nav a { font-size: 12px; }
+  .site-nav .only-mobile { display: list-item; }
+
+  .section { padding: 80px 0; }
+  .page-top { padding-top: 80px; }
+
+  .hero { padding-top: 100px; }
+  .hero__quote { font-size: 52px; line-height: 1.12; margin-top: 32px; }
+
+  .projects { gap: 40px 16px; padding-top: 80px; }
+  .project--hero .project__media { aspect-ratio: 358 / 220; }
+  .project--wide .project__media { aspect-ratio: 358 / 220; }
+  .project__media { aspect-ratio: 171 / 225; }
+  .project__badge { display: none; }
+  .project__kicker { font-size: 16px; }
+  .project__title { font-size: 18px; }
+
+  .statement, .statement--narrow { grid-template-columns: 1fr; }
+  .statement__text { font-size: 26px; }
+  .statement .pill { justify-self: start; margin-top: 32px; }
+
+  .service summary { font-size: 26px; padding: 24px 0; }
+  .service li { font-size: 18px; }
+
+  .title-xl, .site-footer__title { font-size: 40px; }
+  .lead { font-size: 22px; }
+  .body-l { font-size: 18px; }
+  .text-cta { grid-template-columns: 1fr; gap: 24px; }
+  .text-cta .pill { justify-self: start; }
+
+  .ticker__track img { height: calc(var(--h, 400px) * .6); }
+  .carousel__track { gap: 12px; }
+  .carousel--photos .carousel__track img { width: 70%; }
+
+  .site-footer { padding: 80px 0 48px; margin-top: 80px; }
+  .site-footer__title { margin: 16px 0 40px; font-size: 32px; }
+  .site-footer__grid { grid-template-columns: 1fr; gap: 48px; }
+  .site-footer__copy { margin-top: 64px; }
+}
