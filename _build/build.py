@@ -43,24 +43,23 @@ graphics = [x["file"] for x in M["graphics_d"]]
 web = [x["file"] for x in M["web_site_d"]]
 about = [x["file"] for x in M["about_d"]]
 
-# --- Nastro iniziale
-strip_files = [portraits[0], graphics[1], "vid-goal.jpg", apm[1], "poster-echoverse.jpg", felina[1],
-               portraits[1], "vid-thuram.jpg", graphics[0], apm[0], "poster-jago.jpg", portraits[2]]
-strip = "".join(img(f, "") for f in strip_files)
-strip_html = f'<div class="strip" aria-hidden="true"><div class="strip__track">{strip}{strip}</div></div>'
-
 # --- Galleria foto
+SERIES = {"apm": ("AtleticProgettoMontagna", apm), "felina": ("Felina F.C.", felina), "portraits": ("Portraits", portraits)}
+# Le 12 foto della vista iniziale (indice nella serie), in quest'ordine
+PICKS = [("felina", 3), ("apm", 5), ("portraits", 0), ("apm", 6), ("felina", 1), ("portraits", 5),
+         ("apm", 10), ("felina", 8), ("portraits", 10), ("apm", 16), ("felina", 6), ("portraits", 4)]
+order = PICKS + [(k, i) for k, (_, files) in SERIES.items() for i in range(len(files)) if (k, i) not in PICKS]
 figs = []
-for key, label, files in [("apm", "AtleticProgettoMontagna", apm), ("felina", "Felina F.C.", felina), ("portraits", "Portraits", portraits)]:
-    for i, f in enumerate(files):
-        pick = "1" if i < 4 else "0"
-        figs.append(f'<figure data-series="{key}" data-pick="{pick}" tabindex="0">{img(f, f"{label} — photo {i+1}")}<figcaption class="mono">{label}</figcaption></figure>')
+for key, i in order:
+    label, files = SERIES[key]
+    pick = "1" if (key, i) in PICKS else "0"
+    figs.append(f'<figure data-series="{key}" data-pick="{pick}" tabindex="0">{img(files[i], f"{label} — photo {i+1}")}<figcaption class="mono">{label}</figcaption></figure>')
 gallery = "\n        ".join(figs)
 total = len(apm) + len(felina) + len(portraits)
 
 # --- Poster
 posters = "\n        ".join(
-    f'<figure class="poster">{img(f, f"Graphic post {i+1:02d}")}<p class="mono"><span>{i+1:02d}</span><span class="dim">/ {len(graphics):02d}</span></p></figure>'
+    f'<figure class="poster">{img(f, f"Graphic post {i+1:02d}")}</figure>'
     for i, f in enumerate(graphics))
 
 # --- Telefoni
@@ -114,7 +113,6 @@ html = f"""<!doctype html>
     <a href="#index">Work</a><a href="#about">About</a><a href="#contact">Contact</a>
   </nav>
   <div class="bar__meta mono">
-    <span>BCN <span data-clock>--:--</span></span>
     <span><span class="dot" aria-hidden="true"></span>Available</span>
     @@LANG@@
     <button class="bar__theme mono" type="button" data-theme-toggle aria-label="Switch to light theme"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="6" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M7 1a6 6 0 0 1 0 12z" fill="currentColor"/></svg></button>
@@ -159,7 +157,6 @@ html = f"""<!doctype html>
 
   <section class="chapter" id="photo" aria-labelledby="photo-title">
     <header class="chapter__head rv">
-      <p class="chapter__n mono">01 — Photography</p>
       <h2 class="chapter__title" id="photo-title">Photo<span class="serif">graphy</span></h2>
       <p class="chapter__lede">Two seasons as <strong>Social Media Manager for AtleticProgettoMontagna</strong>, shooting their matches. A summer tournament with <strong>Felina F.C.</strong> And portraits of the people around me — something I really enjoy.</p>
     </header>
@@ -175,29 +172,19 @@ html = f"""<!doctype html>
     <button class="chip mono gallery__more" type="button">Show all {total} photos</button>
   </section>
 
-  <section class="chapter" id="graphics" aria-labelledby="graphics-title" style="padding-bottom:0">
+  <section class="chapter" id="graphics" aria-labelledby="graphics-title">
     <header class="chapter__head rv">
-      <p class="chapter__n mono">02 — Graphic design</p>
       <h2 class="chapter__title" id="graphics-title">Graphic <span class="serif">design</span></h2>
       <p class="chapter__lede">Graphics have always fascinated me. Match-day posters for the <strong>APM sports club</strong>, and editorial posts for <strong>Dsgn.pop</strong>, my design page on Instagram.</p>
     </header>
-  </section>
-  <section class="pin" aria-label="Graphic posts">
-    <div class="pin__sticky">
-      <div class="pin__track">
-        <div class="poster poster--intro">
-          <p class="mono dim">Scroll →</p>
-          <p>Posters, carousels and editorial posts — <span class="serif">published every day</span> on Dsgn.pop.<br><br><a class="mono ulink" href="{IG}" target="_blank" rel="noopener">Follow @dsgn.pop {ARROW}</a></p>
-        </div>
+    <div class="posters rv" aria-label="Graphic posts">
         {posters}
-      </div>
-      <div class="pin__progress" aria-hidden="true"><span></span></div>
     </div>
+    <p class="posters__follow"><a class="mono ulink" href="{IG}" target="_blank" rel="noopener">Follow @dsgn.pop {ARROW}</a></p>
   </section>
 
   <section class="chapter" id="video" aria-labelledby="video-title">
     <header class="chapter__head rv">
-      <p class="chapter__n mono">03 — Video editing</p>
       <h2 class="chapter__title" id="video-title">Built on <span class="serif">rhythm</span></h2>
       <p class="chapter__lede">Crafted for visual impact. Short-form edits where fast cuts, beat-driven transitions and pacing turn <strong>performance into emotion</strong>.</p>
     </header>
@@ -216,7 +203,6 @@ html = f"""<!doctype html>
 
   <section class="chapter" id="web" aria-labelledby="web-title">
     <header class="chapter__head rv">
-      <p class="chapter__n mono">04 — Web design</p>
       <h2 class="chapter__title" id="web-title">Web<span class="serif">sites</span></h2>
       <p class="chapter__lede">Two seasons managing the <strong>AtleticProgettoMontagna</strong> website. Before that, two internships at <a class="ulink" href="https://www.officina48.it" target="_blank" rel="noopener"><strong>Officina48</strong></a>: WordPress and Elementor for local brands, then a central role on <strong>municipal and institutional websites</strong> — clarity, usability and reliability for public communication.</p>
     </header>
@@ -227,7 +213,6 @@ html = f"""<!doctype html>
 
   <section class="chapter" id="about" aria-labelledby="about-title">
     <header class="chapter__head rv">
-      <p class="chapter__n mono">05 — About</p>
       <h2 class="chapter__title" id="about-title">The <span class="serif">story</span></h2>
     </header>
     <div class="about">
@@ -248,7 +233,6 @@ html = f"""<!doctype html>
 
   <section class="chapter" id="services" aria-labelledby="services-title">
     <header class="chapter__head rv">
-      <p class="chapter__n mono">06 — Services</p>
       <h2 class="chapter__title" id="services-title">How I can <span class="serif">help</span></h2>
     </header>
     <div class="services rv">
@@ -261,7 +245,7 @@ html = f"""<!doctype html>
 
   <section class="contact" id="contact" aria-labelledby="contact-title">
     <div class="contact__lead">
-      <p class="mono dim" id="contact-title">07 — Contact</p>
+      <p class="mono dim" id="contact-title">Contact</p>
       <p>Have an idea worth building? Let’s turn it into something people notice. Open to collaborations, freelance projects and bold concepts where design and strategy collide.</p>
     </div>
     <button class="mail" type="button" data-copy="lorenzodevicienti@gmail.com" aria-label="Copy email address lorenzodevicienti@gmail.com"><span>lorenzodevicienti@gmail.com</span></button>

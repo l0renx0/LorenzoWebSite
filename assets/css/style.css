@@ -584,3 +584,28 @@ h1.motto__intro strong { font-weight: 700; color: var(--ink); }
 /* Indice: la fascia chiara al passaggio del mouse sborda un po' ai lati,
    così numero e quantità non toccano il bordo */
 .row::before { inset: 0 calc(min(var(--pad), 24px) * -1); }
+
+/* ==========================================================================
+   Meno rumore: titoli senza etichette numerate, poster in griglia ferma
+   ========================================================================== */
+.chapter__title { grid-column: 1 / span 8; }
+.chapter__lede { grid-column: 9 / span 4; grid-row: 1; align-self: end; margin-top: 0; }
+@media (min-width: 901px) and (max-width: 1200px) {
+  .chapter__title { grid-column: 1 / span 7; }
+  .chapter__lede { grid-column: 8 / span 5; }
+}
+@media (max-width: 900px) {
+  .chapter__title, .chapter__lede { grid-column: 1 / -1; grid-row: auto; }
+}
+
+.posters { display: grid; grid-template-columns: repeat(5, 1fr); gap: clamp(10px, 1.4vw, 20px); }
+.posters .poster { width: auto; }
+.posters .poster img { box-shadow: none; transition: transform .8s var(--ease); }
+.posters .poster:hover img { transform: translateY(-6px); }
+.posters__follow { margin-top: 28px; }
+@media (max-width: 1100px) { .posters { grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 900px) { .posters { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 560px) { .posters { grid-template-columns: repeat(2, 1fr); } }
+/* 10 poster: 5 colonne (2 righe piene) oppure 2 colonne (5 righe piene), mai righe a metà */
+@media (max-width: 1100px) { .posters { grid-template-columns: repeat(5, 1fr); } }
+@media (max-width: 760px) { .posters { grid-template-columns: repeat(2, 1fr); } }

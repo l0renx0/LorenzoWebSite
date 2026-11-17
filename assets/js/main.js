@@ -22,14 +22,6 @@ themeBtns.forEach((b) => b.addEventListener("click", () => {
   try { localStorage.setItem("ld-theme", root.dataset.theme); } catch (e) {}
 }));
 
-// Orologio di Barcellona
-const clock = $("[data-clock]");
-const tick = () => {
-  if (!clock) return;
-  clock.textContent = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Madrid" }).format(new Date());
-};
-tick(); setInterval(tick, 15000);
-
 // Barra: sfondo dopo lo scroll, si nasconde scendendo
 const bar = $(".bar");
 let lastY = scrollY;
@@ -114,30 +106,6 @@ if (lb && gallery) {
   $(".lb__close", lb).onclick = () => lb.close();
   lb.addEventListener("click", (e) => { if (e.target === lb) lb.close(); });
   lb.addEventListener("keydown", (e) => { if (e.key === "ArrowLeft") show(pos - 1); if (e.key === "ArrowRight") show(pos + 1); });
-}
-
-// Grafica: lo scroll verticale fa scorrere i poster in orizzontale
-const pin = $(".pin");
-if (pin) {
-  const sticky = $(".pin__sticky", pin), track = $(".pin__track", pin), bar = $(".pin__progress", pin);
-  const size = () => {
-    if (reduce || innerWidth < 700) { pin.style.height = ""; sticky.style.position = "static"; sticky.style.height = "auto"; sticky.style.overflowX = "auto"; track.style.transform = ""; return false; }
-    sticky.style.position = ""; sticky.style.height = ""; sticky.style.overflowX = "";
-    const dist = track.scrollWidth - innerWidth;
-    pin.style.height = `${innerHeight + dist}px`;
-    return dist;
-  };
-  let dist = size();
-  addEventListener("resize", () => (dist = size()));
-  addEventListener("load", () => (dist = size()));
-  const onScroll = () => {
-    if (!dist) return;
-    const top = pin.getBoundingClientRect().top;
-    const p = Math.min(1, Math.max(0, -top / dist));
-    track.style.transform = `translate3d(${-p * dist}px,0,0)`;
-    bar.style.setProperty("--p", p);
-  };
-  addEventListener("scroll", onScroll, { passive: true }); onScroll();
 }
 
 // Email: clic = copia negli appunti (con link mailto come alternativa)
