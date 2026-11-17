@@ -92,7 +92,7 @@ html = f"""<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Lorenzo Devicienti · Photo, Graphics, Video & Web</title>
-<meta name="description" content="Lorenzo Devicienti: photography, graphic design, video editing and websites, based in Barcelona. Social Media Manager at AtleticProgettoMontagna and founder of Dsgn.pop.">
+<meta name="description" content="Lorenzo Devicienti: photography, graphic design, video editing and websites, based in Barcelona. Founder of Dsgn.pop.">
 <link rel="canonical" href="@@CANON@@">
 @@HREFLANG@@
 <meta property="og:type" content="website">
@@ -146,7 +146,7 @@ html = f"""<!doctype html>
   <section class="motto" aria-label="Motto">
 @@MOTTO@@    <div class="motto__foot">
       <p class="motto__cite mono">A quote by <cite>Mirko Martorana</cite></p>
-      <h1 class="motto__intro"><strong>I’m Lorenzo Devicienti.</strong> I work with photography, graphic design, video editing and websites. Social Media Manager at AtleticProgettoMontagna, founder of Dsgn.pop.</h1>
+      <h1 class="motto__intro"><strong>I’m Lorenzo Devicienti.</strong> I work with photography, graphic design, video editing and websites. Based in Barcelona, founder of Dsgn.pop.</h1>
       <a class="mono motto__cta" href="#index">See the work <svg width="10" height="12" viewBox="0 0 10 12" aria-hidden="true"><path d="M5 0v11M1 7l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></a>
     </div>
   </section>
@@ -165,7 +165,7 @@ html = f"""<!doctype html>
     <header class="chapter__head rv">
       <p class="chapter__n mono">01 — Photography</p>
       <h2 class="chapter__title" id="photo-title">Photo<span class="serif">graphy</span></h2>
-      <p class="chapter__lede">Second season as <strong>Social Media Manager for AtleticProgettoMontagna</strong>, shooting their matches. A summer tournament with <strong>Felina F.C.</strong> And portraits of the people around me — something I really enjoy.</p>
+      <p class="chapter__lede">Two seasons as <strong>Social Media Manager for AtleticProgettoMontagna</strong>, shooting their matches. A summer tournament with <strong>Felina F.C.</strong> And portraits of the people around me — something I really enjoy.</p>
     </header>
     <div class="filters mono" role="group" aria-label="Filter photos">
       <button class="chip" data-filter="all" aria-pressed="true">Selected<sup>12</sup></button>
@@ -241,7 +241,8 @@ html = f"""<!doctype html>
         <ol class="timeline">
           <li class="rv"><span class="mono dim">University</span><div><h3>Unimore — Digital Marketing</h3><p>Department of Communication and Economics, Reggio Emilia. Three years of video editing, programmatic, graphic design, web development and ad strategy. I learned what I like — and, more importantly, what I don’t.</p></div></li>
           <li class="rv"><span class="mono dim">Internships</span><div><h3>Officina48 S.n.C.</h3><p>A real creative workflow: content, visual design and WordPress layouts for local businesses, then municipal websites across the territory.</p></div></li>
-          <li class="rv"><span class="mono dim">Now</span><div><h3>Social Media Manager — APM</h3><p>Second season with AtleticProgettoMontagna: match photography, graphics and social content.</p></div></li>
+          <li class="rv"><span class="mono dim">Until Aug 2026</span><div><h3>Social Media Manager — APM</h3><p>Two seasons with AtleticProgettoMontagna: match photography, graphics and social content.</p></div></li>
+          <li class="rv"><span class="mono dim">Now</span><div><h3>Barcelona</h3><p>Based in Barcelona and open to new projects, collaborations and roles.</p></div></li>
           <li class="rv"><span class="mono dim">Side project</span><div><h3>Dsgn.pop</h3><p>My Instagram page about design, where I keep practising in public.</p></div></li>
           <li class="rv"><span class="mono dim">Approach</span><div><h3>AI as a helper</h3><p>I use AI to simplify and speed up the work — never to replace the idea.</p></div></li>
         </ol>
