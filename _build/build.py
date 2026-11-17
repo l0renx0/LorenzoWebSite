@@ -76,8 +76,8 @@ def browser(f, url, name, href):
             f'<span class="browser__url mono">{url}</span></div>{img(f, name + " website")}'
             f'<figcaption><span>{name}</span><a class="mono ulink" href="{href}" target="_blank" rel="noopener">Visit {ARROW}</a></figcaption></figure>')
 browsers = "\n        ".join([
+    browser("web-apm.jpg", "atleticprogettomontagna.it", "AtleticProgettoMontagna", "https://www.atleticprogettomontagna.it"),
     browser(web[0], "aglf.academy", "AGLF Education", "https://www.aglf.academy"),
-    browser(web[1], "aglf.academy/study-abroad", "AGLF Education", "https://www.aglf.academy"),
     browser(web[3], "comune.castelnovo-nemonti.re.it", "Castelnovo ne’ Monti", "https://www.comune.castelnovo-nemonti.re.it"),
     browser(web[4], "comune.casina.re.it", "Casina", "https://www.comune.casina.re.it"),
     browser(web[5], "comune.villa-minozzo.re.it", "Villa Minozzo", "https://www.comune.villa-minozzo.re.it"),
@@ -157,7 +157,7 @@ html = f"""<!doctype html>
     <a class="row" href="#photo" data-key="photo"><span class="row__n mono">01</span><span class="row__t">Photography</span><span class="row__d">AtleticProgettoMontagna · Felina F.C. · Portraits</span><span class="row__c mono">{total} photos</span></a>
     <a class="row" href="#graphics" data-key="graphics"><span class="row__n mono">02</span><span class="row__t">Graphic design</span><span class="row__d">APM match posters · Dsgn.pop</span><span class="row__c mono">{len(graphics)} posts</span></a>
     <a class="row" href="#video" data-key="video"><span class="row__n mono">03</span><span class="row__t">Video editing</span><span class="row__d">Marcus Thuram — short-form edit</span><span class="row__c mono">TikTok-first</span></a>
-    <a class="row" href="#web" data-key="web"><span class="row__n mono">04</span><span class="row__t">Web design</span><span class="row__d">AGLF · Castelnovo ne’ Monti · Casina · Villa Minozzo</span><span class="row__c mono">4 sites</span></a>
+    <a class="row" href="#web" data-key="web"><span class="row__n mono">04</span><span class="row__t">Web design</span><span class="row__d">AtleticProgettoMontagna · AGLF · Castelnovo ne’ Monti · Casina · Villa Minozzo</span><span class="row__c mono">5 sites</span></a>
     <div class="preview" aria-hidden="true">{preview}</div>
   </section>
 
@@ -222,7 +222,7 @@ html = f"""<!doctype html>
     <header class="chapter__head rv">
       <p class="chapter__n mono">04 — Web design</p>
       <h2 class="chapter__title" id="web-title">Web<span class="serif">sites</span></h2>
-      <p class="chapter__lede">Two internships at <a class="ulink" href="https://www.officina48.it" target="_blank" rel="noopener"><strong>Officina48</strong></a>: WordPress and Elementor for local brands, then a central role on <strong>municipal and institutional websites</strong> — clarity, usability and reliability for public communication.</p>
+      <p class="chapter__lede">Two seasons managing the <strong>AtleticProgettoMontagna</strong> website. Before that, two internships at <a class="ulink" href="https://www.officina48.it" target="_blank" rel="noopener"><strong>Officina48</strong></a>: WordPress and Elementor for local brands, then a central role on <strong>municipal and institutional websites</strong> — clarity, usability and reliability for public communication.</p>
     </header>
     <div class="browsers">
         {browsers}
