@@ -7,9 +7,17 @@ const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 // Tema chiaro/scuro (ricordato in questo browser)
 const root = document.documentElement;
 try { const t = localStorage.getItem("ld-theme"); if (t) root.dataset.theme = t; } catch (e) {}
-$("[data-theme-toggle]")?.addEventListener("click", () => {
-  const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
-  root.dataset.theme = dark ? "light" : "dark";
+const themeBtn = $("[data-theme-toggle]");
+const themeMeta = $('meta[name="theme-color"]');
+const syncTheme = () => {
+  const light = root.dataset.theme === "light";
+  themeBtn?.setAttribute("aria-label", light ? "Switch to dark theme" : "Switch to light theme");
+  themeMeta?.setAttribute("content", light ? "#eeefec" : "#0c0c0b");
+};
+syncTheme();
+themeBtn?.addEventListener("click", () => {
+  root.dataset.theme = root.dataset.theme === "light" ? "dark" : "light";
+  syncTheme();
   try { localStorage.setItem("ld-theme", root.dataset.theme); } catch (e) {}
 });
 
@@ -224,4 +232,39 @@ if (motto) {
     sec.addEventListener("pointermove", (e) => { px = e.clientX; py = e.clientY; if (!raf) raf = requestAnimationFrame(paint); });
     sec.addEventListener("pointerleave", () => { px = py = -9999; if (!raf) raf = requestAnimationFrame(paint); });
   }
+}
+
+// ---------------------------------------------------------------------------
+// Menu a tutto schermo (telefono e tablet)
+// ---------------------------------------------------------------------------
+const menu = $("#menu");
+const menuBtn = $(".bar__menu");
+if (menu && menuBtn) {
+  const setMenu = (open) => {
+    menu.classList.toggle("is-open", open);
+    menuBtn.setAttribute("aria-expanded", String(open));
+    document.body.classList.toggle("menu-open", open);
+    bar.classList.remove("is-hidden");
+    if (open) $("a", menu)?.focus({ preventScroll: true });
+  };
+  menuBtn.addEventListener("click", () => setMenu(!menu.classList.contains("is-open")));
+  $$("a", menu).forEach((a) => a.addEventListener("click", () => setMenu(false)));
+  addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && menu.classList.contains("is-open")) { setMenu(false); menuBtn.focus(); }
+  });
+  matchMedia("(min-width: 901px)").addEventListener("change", (e) => { if (e.matches) setMenu(false); });
+}
+
+// ---------------------------------------------------------------------------
+// Lightbox: scorrimento col dito su telefono e tablet
+// ---------------------------------------------------------------------------
+if (lb) {
+  let sx = 0, sy = 0;
+  lb.addEventListener("touchstart", (e) => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
+  lb.addEventListener("touchend", (e) => {
+    const dx = e.changedTouches[0].clientX - sx;
+    const dy = e.changedTouches[0].clientY - sy;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) $(dx < 0 ? ".lb__next" : ".lb__prev", lb).click();
+    else if (dy > 90 && Math.abs(dy) > Math.abs(dx)) lb.close();
+  }, { passive: true });
 }

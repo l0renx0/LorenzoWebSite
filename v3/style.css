@@ -1,35 +1,35 @@
 /* ==========================================================================
    Lorenzo Devicienti — concept v3
-   Carta calda, inchiostro, un solo colore segnale.
+   Scuro come scelta principale (versione chiara dal pulsante in alto).
+   Un solo carattere variabile, un solo colore segnale.
    ========================================================================== */
 
 :root {
-  --paper: #eeefec;
-  --paper-2: #e2e3df;
-  --ink: #111110;
-  --ink-2: #5d5b56;
-  --ink-3: #9a978f;
-  --line: rgba(17, 17, 16, .14);
-  --signal: #2b3dff;
+  /* Tema scuro: è quello di base, indipendentemente dal sistema */
+  --paper: #0c0c0b;
+  --paper-2: #161615;
+  --ink: #edece7;
+  --ink-2: #a3a199;
+  --ink-3: #64625c;
+  --line: rgba(237, 236, 231, .13);
+  --signal: #4b5cff;
+  --shadow: rgba(0, 0, 0, .6);
 
   /* Un solo carattere variabile: la larghezza (62–125%) e il peso fanno da sistema */
   --sans: "Archivo", "Arial Narrow", system-ui, -apple-system, sans-serif;
 
-  --pad: clamp(16px, 3.4vw, 48px);
+  /* Margine laterale: cresce con lo schermo, rispetta notch e barre di sistema,
+     e oltre 1840px tiene il contenuto centrato */
+  --pad: max(clamp(16px, 3.4vw, 48px), calc((100vw - 1840px) / 2),
+             calc(env(safe-area-inset-left, 0px) + 12px), calc(env(safe-area-inset-right, 0px) + 12px));
   --ease: cubic-bezier(.16, 1, .3, 1);
   --radius: 6px;
-  color-scheme: light;
+  color-scheme: dark;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --paper: #0f0f0e; --paper-2: #1a1a18; --ink: #efece5; --ink-2: #a9a59c; --ink-3: #6f6c65;
-    --line: rgba(239, 236, 229, .14); --signal: #8a96ff; color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --paper: #0f0f0e; --paper-2: #1a1a18; --ink: #efece5; --ink-2: #a9a59c; --ink-3: #6f6c65;
-  --line: rgba(239, 236, 229, .14); --signal: #8a96ff; color-scheme: dark;
+:root[data-theme="light"] {
+  --paper: #eeefec; --paper-2: #e2e3df; --ink: #111110; --ink-2: #5d5b56; --ink-3: #8f8c84;
+  --line: rgba(17, 17, 16, .14); --signal: #2b3dff; --shadow: rgba(0, 0, 0, .35); color-scheme: light;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -50,11 +50,10 @@ button { font: inherit; color: inherit; }
 
 /* Grana leggera su tutta la pagina, come carta stampata */
 body::after {
-  content: ""; position: fixed; inset: 0; z-index: 90; pointer-events: none; opacity: .07; mix-blend-mode: multiply;
+  content: ""; position: fixed; inset: 0; z-index: 90; pointer-events: none; opacity: .05; mix-blend-mode: screen;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) body::after { mix-blend-mode: screen; opacity: .05; } }
-:root[data-theme="dark"] body::after { mix-blend-mode: screen; opacity: .05; }
+:root[data-theme="light"] body::after { mix-blend-mode: multiply; opacity: .07; }
 
 .mono { font-family: var(--sans); font-size: 11px; font-weight: 500; font-stretch: 118%; letter-spacing: .07em; text-transform: uppercase; }
 .serif { font-style: italic; font-weight: 250; font-stretch: 125%; letter-spacing: -.02em; }
@@ -418,4 +417,122 @@ body::after {
   .motto__line--w { display: none; }
   .motto__line--n { display: block; }
   .motto__text { line-height: .84; }
+}
+
+/* ==========================================================================
+   Tutti i dispositivi: menu, notch, tablet, schermi grandi
+   ========================================================================== */
+
+/* Barra: tiene conto del notch in alto */
+.bar { padding-top: calc(14px + env(safe-area-inset-top, 0px)); padding-inline: var(--pad); }
+.bar__meta { gap: clamp(10px, 2vw, 18px); }
+.bar__menu { display: none; background: none; border: 1px solid var(--line); border-radius: 100px; padding: 7px 14px; cursor: pointer; min-height: 32px; }
+.bar__menu-close { display: none; }
+.bar__menu[aria-expanded="true"] .bar__menu-open { display: none; }
+.bar__menu[aria-expanded="true"] .bar__menu-close { display: inline; }
+.bar__theme { width: 32px; height: 32px; display: grid; place-items: center; margin: -9px -9px -9px -4px; }
+.motto__line, .row__t, .chapter__title { font-optical-sizing: auto; }
+
+/* Menu a tutto schermo */
+.menu {
+  position: fixed; inset: 0; z-index: 55; background: var(--paper);
+  display: flex; flex-direction: column; justify-content: space-between; gap: 32px;
+  padding: calc(84px + env(safe-area-inset-top, 0px)) var(--pad) calc(28px + env(safe-area-inset-bottom, 0px));
+  overflow-y: auto; overscroll-behavior: contain;
+  clip-path: inset(0 0 100% 0); visibility: hidden;
+  transition: clip-path .8s var(--ease), visibility 0s .8s;
+}
+.menu.is-open { clip-path: inset(0); visibility: visible; transition: clip-path .8s var(--ease), visibility 0s; }
+.menu__list li { border-bottom: 1px solid var(--line); overflow: hidden; }
+.menu__list a {
+  display: flex; align-items: baseline; gap: 16px; padding-block: 10px 6px;
+  font-size: clamp(44px, 12.5vw, 104px); line-height: .9; font-weight: 800; font-stretch: 66%; text-transform: uppercase;
+  transform: translateY(105%); transition: transform .9s var(--ease), font-stretch .6s var(--ease), font-weight .6s var(--ease);
+}
+.menu__list a .mono { color: var(--ink-3); min-width: 2.2em; }
+.menu.is-open .menu__list a { transform: none; }
+.menu.is-open .menu__list li:nth-child(2) a { transition-delay: .05s; }
+.menu.is-open .menu__list li:nth-child(3) a { transition-delay: .1s; }
+.menu.is-open .menu__list li:nth-child(4) a { transition-delay: .15s; }
+.menu.is-open .menu__list li:nth-child(5) a { transition-delay: .2s; }
+.menu.is-open .menu__list li:nth-child(6) a { transition-delay: .25s; }
+.menu.is-open .menu__list li:nth-child(7) a { transition-delay: .3s; }
+.menu__list a:active, .menu__list a:hover { font-stretch: 100%; font-weight: 300; }
+.menu__foot { display: flex; flex-wrap: wrap; gap: 12px 24px; }
+body.menu-open { overflow: hidden; }
+
+/* Galleria: due colonne sul telefono, tre su tablet */
+@media (max-width: 1100px) { .gallery { columns: 3; } }
+@media (max-width: 560px) { .gallery { columns: 2; column-gap: 8px; } .gallery figure { margin-bottom: 8px; } }
+
+/* Poster su schermi senza effetto "pin": scorrimento orizzontale a scatti */
+.pin__sticky[style*="overflow-x"] { scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; padding-bottom: 16px; }
+.pin__sticky[style*="overflow-x"] .poster { scroll-snap-align: start; }
+.pin__sticky[style*="overflow-x"] .pin__progress { display: none; }
+
+/* Elementi interattivi grandi abbastanza per il dito */
+@media (pointer: coarse) {
+  .chip { min-height: 40px; }
+  .lb button { min-width: 44px; min-height: 44px; }
+  .contact__grid a, .browser figcaption a { display: inline-block; padding-block: 6px; }
+  .strip__track img { filter: grayscale(.6); }
+}
+
+/* Tablet (iPad verticale e simili) */
+@media (max-width: 900px) {
+  .bar__menu { display: inline-flex; align-items: center; }
+  .bar { grid-template-columns: 1fr auto; }
+  .row { padding-block: 22px; }
+  .row__d { font-size: 14px; }
+  .browsers { gap: 16px; }
+  .about__photo { max-width: 360px; }
+}
+@media (min-width: 561px) and (max-width: 900px) {
+  .phones { grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .phone { border-radius: 20px; padding: 5px; }
+  .phone img { border-radius: 16px; }
+  .browser:nth-child(n+3) { grid-column: span 3; }
+  .browser:nth-child(5) { grid-column: 1 / -1; }
+  .browser { grid-column: span 3; }
+  .browsers { grid-template-columns: repeat(6, 1fr); }
+}
+
+/* iPad orizzontale e portatili piccoli */
+@media (min-width: 901px) and (max-width: 1200px) {
+  .row__t { grid-column: 2 / span 6; }
+  .row__d { grid-column: 8 / span 3; }
+  .chapter__lede { grid-column: 7 / span 6; }
+  .video-notes > p { grid-column: 1 / span 7; }
+  .video-notes > div { grid-column: 9 / span 4; }
+  .about__body { grid-column: 6 / span 7; }
+}
+
+/* Telefono */
+@media (max-width: 560px) {
+  .bar__meta > span:first-child { display: none; }
+  .bar__name { font-size: 14px; }
+  .motto__foot { margin-top: 20px; }
+  .motto__intro { font-size: 17px; }
+  .chapter { padding-top: 96px; }
+  .row { padding-block: 16px; gap: 4px 12px; }
+  .row__c { grid-column: 2 / -1; grid-row: 3; text-align: left; color: var(--ink-3); }
+  .row__d { grid-row: 2; }
+  .filters { flex-wrap: nowrap; overflow-x: auto; margin-inline: calc(var(--pad) * -1); padding-inline: var(--pad); scrollbar-width: none; }
+  .filters::-webkit-scrollbar { display: none; }
+  .chip { white-space: nowrap; }
+  .video-notes > p, .poster--intro p, .contact__lead p:last-child { font-size: 20px; }
+  .lb__ui { padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
+}
+
+/* Telefono in orizzontale: niente altezze a tutto schermo che tagliano */
+@media (max-height: 500px) and (orientation: landscape) {
+  .contact { min-height: auto; }
+  .menu__list a { font-size: clamp(32px, 9vh, 56px); }
+  .lb img { max-height: 70dvh; }
+}
+
+/* Schermi molto grandi: testo di base un po' più grande */
+@media (min-width: 1800px) {
+  body { font-size: 18px; }
+  .motto__intro, .chapter__lede { font-size: 20px; }
 }
