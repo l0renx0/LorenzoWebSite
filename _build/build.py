@@ -151,8 +151,6 @@ html = f"""<!doctype html>
     </div>
   </section>
 
-  {strip_html}
-
   <section class="index" id="index" aria-labelledby="index-title">
     <h2 class="sr-only" id="index-title">Selected work</h2>
     <div class="index__head mono dim" aria-hidden="true"><span>No.</span><span>Discipline</span><span>Highlights</span><span>Volume</span></div>
