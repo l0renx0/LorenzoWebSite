@@ -580,3 +580,7 @@ h1.motto__intro strong { font-weight: 700; color: var(--ink); }
   .index { padding-block: 96px 24px; }
   .row { padding-block: 22px; }
 }
+
+/* Indice: la fascia chiara al passaggio del mouse sborda un po' ai lati,
+   così numero e quantità non toccano il bordo */
+.row::before { inset: 0 calc(min(var(--pad), 24px) * -1); }

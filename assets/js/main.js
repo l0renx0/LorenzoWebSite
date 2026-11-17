@@ -64,34 +64,6 @@ $$("[data-words]").forEach((el) => {
   walk(el);
 });
 
-// Indice: anteprima che segue il mouse
-const preview = $(".preview");
-if (preview && matchMedia("(hover: hover) and (pointer: fine)").matches) {
-  // L'anteprima compare solo quando muovi davvero il mouse su una riga:
-  // mentre scorri la pagina sparisce, così non sembra "trascinata" dalle righe.
-  let x = 0, y = 0, px = 0, py = 0, raf = 0, key = "";
-  const place = () => { preview.style.transform = `translate3d(${px + 24}px, ${py - 160}px, 0)`; };
-  const loop = () => {
-    px += (x - px) * 0.2; py += (y - py) * 0.2;
-    place();
-    raf = preview.classList.contains("is-on") ? requestAnimationFrame(loop) : 0;
-  };
-  const hide = () => { preview.classList.remove("is-on"); key = ""; };
-  $$(".row").forEach((row) => {
-    row.addEventListener("pointermove", (e) => {
-      x = e.clientX; y = e.clientY;
-      if (key !== row.dataset.key) {
-        if (!key) { px = x; py = y; place(); } // parte dal cursore, senza scie
-        key = row.dataset.key;
-        $$("img", preview).forEach((im) => im.classList.toggle("is-on", im.dataset.key === key));
-        preview.classList.add("is-on");
-      }
-      if (reduce) { px = x; py = y; place(); } else if (!raf) loop();
-    });
-    row.addEventListener("pointerleave", hide);
-  });
-  addEventListener("scroll", hide, { passive: true });
-}
 
 // Foto: filtri per serie (con View Transitions dove supportate)
 const gallery = $(".gallery");

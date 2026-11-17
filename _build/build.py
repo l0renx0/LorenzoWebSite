@@ -83,9 +83,6 @@ browsers = "\n        ".join([
     browser(web[5], "comune.villa-minozzo.re.it", "Villa Minozzo", "https://www.comune.villa-minozzo.re.it"),
 ])
 
-preview = "".join(img(f, "", lazy=False, extra=f' data-key="{k}"') for k, f in
-                  [("photo", portraits[0]), ("graphics", graphics[1]), ("video", "vid-goal.jpg"), ("web", web[3])])
-
 html = f"""<!doctype html>
 <html lang="@@HTMLLANG@@" @@JSDATA@@>
 <head>
@@ -158,7 +155,6 @@ html = f"""<!doctype html>
     <a class="row" href="#graphics" data-key="graphics"><span class="row__n mono">02</span><span class="row__t">Graphic design</span><span class="row__d">APM match posters · Dsgn.pop</span><span class="row__c mono">{len(graphics)} posts</span></a>
     <a class="row" href="#video" data-key="video"><span class="row__n mono">03</span><span class="row__t">Video editing</span><span class="row__d">Marcus Thuram — short-form edit</span><span class="row__c mono">TikTok-first</span></a>
     <a class="row" href="#web" data-key="web"><span class="row__n mono">04</span><span class="row__t">Web design</span><span class="row__d">AtleticProgettoMontagna · AGLF · Castelnovo ne’ Monti · Casina · Villa Minozzo</span><span class="row__c mono">5 sites</span></a>
-    <div class="preview" aria-hidden="true">{preview}</div>
   </section>
 
   <section class="chapter" id="photo" aria-labelledby="photo-title">
