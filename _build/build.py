@@ -1,488 +1,388 @@
+"""Genera il sito: index.html, 404.html e i reindirizzamenti dai vecchi indirizzi.
+
+Uso: python3 _build/build.py
+Testi e immagini della pagina sono in questo file; lo stile in assets/css/style.css,
+le interazioni in assets/js/main.js.
+"""
 import json, os
 from PIL import Image
 
-REPO = "/home/user/lorenzowebsite"
-IMG = REPO + "/assets/img"
-M = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "manifest.json")))
+HERE = os.path.dirname(os.path.abspath(__file__))
+REPO = os.path.dirname(HERE)
+M = json.load(open(os.path.join(HERE, "manifest.json")))
 
-SITE = "Lorenzo Devicienti"
-DESC = ("If you are looking for a highly personalized project and need creative help to bring it to life, "
-        "I would be thrilled to be part of it. Let’s create together!")
-IG_PORTFOLIO = "https://www.instagram.com/dsgn.pop/"
-IG_PERSONAL = "https://www.instagram.com/l0renx0/"
-LINKEDIN = "https://www.linkedin.com/in/lorenzo-devicienti-5a5669278/"
+IG = "https://www.instagram.com/dsgn.pop/"
+IG_ME = "https://www.instagram.com/l0renx0/"
+LI = "https://www.linkedin.com/in/lorenzo-devicienti-5a5669278/"
 TIKTOK = "https://vm.tiktok.com/ZNRYW8jPm/"
-PAGES_URL = "https://l0renx0.github.io/LorenzoWebSite/"
-
-ARROW = '<svg class="arrow" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 11 11 3M4.5 3H11v6.5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>'
-CHEVRON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v15m-6-6 6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>'
-LEFT = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>'
-RIGHT = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>'
-
-NAV = [("photo/", "Photo"), ("graphics/", "Graphics"), ("video/", "Video"), ("web-site/", "Web Site"), ("about/", "About")]
+ARROW = '<svg width="11" height="11" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 11 11 3M4.5 3H11v6.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>'
 
 
-def size(f):
-    w, h = Image.open(os.path.join(IMG, f)).size
-    return w, h
+SITE = "https://l0renx0.github.io/LorenzoWebSite/"
 
 
-def img(root, f, alt, cls="", lazy=True, extra=""):
-    w, h = size(f)
-    c = f' class="{cls}"' if cls else ""
+def src(f):
+    return "assets/img/" + f
+
+
+def img(f, alt, lazy=True, extra=""):
+    path = os.path.join(REPO, src(f))
+    w, h = Image.open(path).size
     l = ' loading="lazy" decoding="async"' if lazy else ""
-    return f'<img src="{root}assets/img/{f}" alt="{alt}" width="{w}" height="{h}"{c}{l}{extra}>'
+    return f'<img src="{src(f)}" alt="{alt}" width="{w}" height="{h}"{l}{extra}>'
 
 
-def pill(href, text, ext=False, cls="pill"):
-    t = ' target="_blank" rel="noopener"' if ext else ""
-    return f'<a class="{cls}" href="{href}"{t}>{text} {ARROW}</a>'
+def series(y):
+    g = sorted([x for x in M["photo_d"] if x["y"] == y], key=lambda x: x["x"])
+    i = next((k for k, x in enumerate(g) if x["x"] >= 200), 0)
+    return [x["file"] for x in g[i:] + g[:i]]
 
 
-def head(root, title, desc, path):
-    full = f"{title} · {SITE}" if title else f"{SITE} · Portfolio"
-    return f"""<!doctype html>
+apm, felina, portraits = series(860), series(2065), series(3365)
+graphics = [x["file"] for x in M["graphics_d"]]
+web = [x["file"] for x in M["web_site_d"]]
+about = [x["file"] for x in M["about_d"]]
+
+# --- Nastro iniziale
+strip_files = [portraits[0], graphics[1], "vid-goal.jpg", apm[1], "poster-echoverse.jpg", felina[1],
+               portraits[1], "vid-thuram.jpg", graphics[0], apm[0], "poster-jago.jpg", portraits[2]]
+strip = "".join(img(f, "") for f in strip_files)
+strip_html = f'<div class="strip" aria-hidden="true"><div class="strip__track">{strip}{strip}</div></div>'
+
+# --- Galleria foto
+figs = []
+for key, label, files in [("apm", "AtleticProgettoMontagna", apm), ("felina", "Felina F.C.", felina), ("portraits", "Portraits", portraits)]:
+    for i, f in enumerate(files):
+        pick = "1" if i < 4 else "0"
+        figs.append(f'<figure data-series="{key}" data-pick="{pick}" tabindex="0">{img(f, f"{label} — photo {i+1}")}<figcaption class="mono">{label}</figcaption></figure>')
+gallery = "\n        ".join(figs)
+total = len(apm) + len(felina) + len(portraits)
+
+# --- Poster
+posters = "\n        ".join(
+    f'<figure class="poster">{img(f, f"Graphic post {i+1:02d}")}<p class="mono"><span>{i+1:02d}</span><span class="dim">/ {len(graphics):02d}</span></p></figure>'
+    for i, f in enumerate(graphics))
+
+# --- Telefoni
+phones = "\n        ".join(f'<figure class="phone">{img(f, a)}</figure>' for f, a in [
+    ("vid-goal.jpg", "Edit frame: “Goal” title over Marcus Thuram"),
+    ("vid-tutu.jpg", "Edit frame: “Tu-Tu” title with the player on a yellow background"),
+    ("vid-celebration.jpg", "Edit frame: team celebration"),
+    ("vid-thuram.jpg", "Edit frame: “Thuram” title in the stadium at night")])
+
+# --- Browser
+def browser(f, url, name, href):
+    return (f'<figure class="browser rv"><div class="browser__bar"><span class="browser__dots"><i></i><i></i><i></i></span>'
+            f'<span class="browser__url mono">{url}</span></div>{img(f, name + " website")}'
+            f'<figcaption><span>{name}</span><a class="mono ulink" href="{href}" target="_blank" rel="noopener">Visit {ARROW}</a></figcaption></figure>')
+browsers = "\n        ".join([
+    browser(web[0], "aglf.academy", "AGLF Education", "https://www.aglf.academy"),
+    browser(web[1], "aglf.academy/study-abroad", "AGLF Education", "https://www.aglf.academy"),
+    browser(web[3], "comune.castelnovo-nemonti.re.it", "Castelnovo ne’ Monti", "https://www.comune.castelnovo-nemonti.re.it"),
+    browser(web[4], "comune.casina.re.it", "Casina", "https://www.comune.casina.re.it"),
+    browser(web[5], "comune.villa-minozzo.re.it", "Villa Minozzo", "https://www.comune.villa-minozzo.re.it"),
+])
+
+preview = "".join(img(f, "", lazy=False, extra=f' data-key="{k}"') for k, f in
+                  [("photo", portraits[0]), ("graphics", graphics[1]), ("video", "vid-goal.jpg"), ("web", web[3])])
+
+html = f"""<!doctype html>
+<html lang="@@HTMLLANG@@" @@JSDATA@@>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lorenzo Devicienti · Photo, Graphics, Video & Web</title>
+<meta name="description" content="Lorenzo Devicienti: photography, graphic design, video editing and websites, based in Barcelona. Social Media Manager at AtleticProgettoMontagna and founder of Dsgn.pop.">
+<link rel="canonical" href="@@CANON@@">
+@@HREFLANG@@
+<meta property="og:type" content="website">
+<meta property="og:title" content="Lorenzo Devicienti">
+<meta property="og:description" content="Photography, graphic design, video editing and websites, based in Barcelona.">
+<meta property="og:image" content="{SITE}assets/img/og-image.jpg">
+<meta property="og:url" content="@@CANON@@">
+<meta property="og:locale" content="@@LOCALE@@">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0c0c0b">
+<link rel="icon" href="assets/img/favicon.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<script src="assets/js/main.js" defer></script>
+</head>
+<body>
+<header class="bar">
+  <a class="bar__name" href="#top">Lorenzo Devicienti</a>
+  <nav class="bar__nav mono" aria-label="Main">
+    <a href="#index">Work</a><a href="#about">About</a><a href="#contact">Contact</a>
+  </nav>
+  <div class="bar__meta mono">
+    <span>BCN <span data-clock>--:--</span></span>
+    <span><span class="dot" aria-hidden="true"></span>Available</span>
+    @@LANG@@
+    <button class="bar__theme mono" type="button" data-theme-toggle aria-label="Switch to light theme"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="6" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M7 1a6 6 0 0 1 0 12z" fill="currentColor"/></svg></button>
+    <button class="bar__menu mono" type="button" aria-expanded="false" aria-controls="menu"><span class="bar__menu-open">Menu</span><span class="bar__menu-close">Close</span><svg class="bar__menu-icon" width="18" height="12" viewBox="0 0 18 12" aria-hidden="true"><path class="l1" d="M0 1h18" stroke="currentColor" stroke-width="1.5"/><path class="l2" d="M0 11h18" stroke="currentColor" stroke-width="1.5"/></svg></button>
+  </div>
+</header>
+<nav class="menu" id="menu" aria-label="Menu">
+  <ol class="menu__list">
+    <li><a href="#photo"><span class="mono">01</span>Photography</a></li>
+    <li><a href="#graphics"><span class="mono">02</span>Graphic design</a></li>
+    <li><a href="#video"><span class="mono">03</span>Video editing</a></li>
+    <li><a href="#web"><span class="mono">04</span>Websites</a></li>
+    <li><a href="#about"><span class="mono">05</span>About</a></li>
+    <li><a href="#services"><span class="mono">06</span>Services</a></li>
+    <li><a href="#contact"><span class="mono">07</span>Contact</a></li>
+  </ol>
+  <div class="menu__foot mono">
+    <a href="{IG}" target="_blank" rel="noopener">Dsgn.pop</a>
+    <a href="{IG_ME}" target="_blank" rel="noopener">Instagram</a>
+    <a href="{LI}" target="_blank" rel="noopener">LinkedIn</a>
+    <button class="menu__theme" type="button" data-theme-toggle><svg width="16" height="16" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="6" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M7 1a6 6 0 0 1 0 12z" fill="currentColor"/></svg></button>
+  </div>
+</nav>
+
+<main id="top">
+  <section class="motto" aria-label="Motto">
+@@MOTTO@@    <div class="motto__foot">
+      <p class="mono">— Mirko Martorana</p>
+      <p class="motto__intro"><strong>Lorenzo Devicienti</strong>. Photography, graphic design, video editing and websites. Social Media Manager at AtleticProgettoMontagna, founder of Dsgn.pop.</p>
+      <a class="mono motto__cta" href="#index">See the work <svg width="10" height="12" viewBox="0 0 10 12" aria-hidden="true"><path d="M5 0v11M1 7l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></a>
+    </div>
+  </section>
+
+  {strip_html}
+
+  <section class="index" id="index" aria-labelledby="index-title">
+    <h2 class="sr-only" id="index-title">Selected work</h2>
+    <div class="index__head mono dim" aria-hidden="true"><span>No.</span><span>Discipline</span><span>Highlights</span><span>Volume</span></div>
+    <a class="row" href="#photo" data-key="photo"><span class="row__n mono">01</span><span class="row__t">Photography</span><span class="row__d">AtleticProgettoMontagna · Felina F.C. · Portraits</span><span class="row__c mono">{total} photos</span></a>
+    <a class="row" href="#graphics" data-key="graphics"><span class="row__n mono">02</span><span class="row__t">Graphic design</span><span class="row__d">APM match posters · Dsgn.pop</span><span class="row__c mono">{len(graphics)} posts</span></a>
+    <a class="row" href="#video" data-key="video"><span class="row__n mono">03</span><span class="row__t">Video editing</span><span class="row__d">Marcus Thuram — short-form edit</span><span class="row__c mono">TikTok-first</span></a>
+    <a class="row" href="#web" data-key="web"><span class="row__n mono">04</span><span class="row__t">Web design</span><span class="row__d">AGLF · Castelnovo ne’ Monti · Casina · Villa Minozzo</span><span class="row__c mono">4 sites</span></a>
+    <div class="preview" aria-hidden="true">{preview}</div>
+  </section>
+
+  <section class="chapter" id="photo" aria-labelledby="photo-title">
+    <header class="chapter__head rv">
+      <p class="chapter__n mono">01 — Photography</p>
+      <h2 class="chapter__title" id="photo-title">Photo<span class="serif">graphy</span></h2>
+      <p class="chapter__lede">Second season as <strong>Social Media Manager for AtleticProgettoMontagna</strong>, shooting their matches. A summer tournament with <strong>Felina F.C.</strong> And portraits of the people around me — something I really enjoy.</p>
+    </header>
+    <div class="filters mono" role="group" aria-label="Filter photos">
+      <button class="chip" data-filter="all" aria-pressed="true">Selected<sup>12</sup></button>
+      <button class="chip" data-filter="apm" aria-pressed="false">AtleticProgettoMontagna<sup>{len(apm)}</sup></button>
+      <button class="chip" data-filter="felina" aria-pressed="false">Felina F.C.<sup>{len(felina)}</sup></button>
+      <button class="chip" data-filter="portraits" aria-pressed="false">Portraits<sup>{len(portraits)}</sup></button>
+    </div>
+    <div class="gallery">
+        {gallery}
+    </div>
+    <button class="chip mono gallery__more" type="button">Show all {total} photos</button>
+  </section>
+
+  <section class="chapter" id="graphics" aria-labelledby="graphics-title" style="padding-bottom:0">
+    <header class="chapter__head rv">
+      <p class="chapter__n mono">02 — Graphic design</p>
+      <h2 class="chapter__title" id="graphics-title">Graphic <span class="serif">design</span></h2>
+      <p class="chapter__lede">Graphics have always fascinated me. Match-day posters for the <strong>APM sports club</strong>, and editorial posts for <strong>Dsgn.pop</strong>, my design page on Instagram.</p>
+    </header>
+  </section>
+  <section class="pin" aria-label="Graphic posts">
+    <div class="pin__sticky">
+      <div class="pin__track">
+        <div class="poster poster--intro">
+          <p class="mono dim">Scroll →</p>
+          <p>Posters, carousels and editorial posts — <span class="serif">published every day</span> on Dsgn.pop.<br><br><a class="mono ulink" href="{IG}" target="_blank" rel="noopener">Follow @dsgn.pop {ARROW}</a></p>
+        </div>
+        {posters}
+      </div>
+      <div class="pin__progress" aria-hidden="true"><span></span></div>
+    </div>
+  </section>
+
+  <section class="chapter" id="video" aria-labelledby="video-title">
+    <header class="chapter__head rv">
+      <p class="chapter__n mono">03 — Video editing</p>
+      <h2 class="chapter__title" id="video-title">Built on <span class="serif">rhythm</span></h2>
+      <p class="chapter__lede">Crafted for visual impact. Short-form edits where fast cuts, beat-driven transitions and pacing turn <strong>performance into emotion</strong>.</p>
+    </header>
+    <div class="phones rv">
+        {phones}
+    </div>
+    <div class="video-notes rv">
+      <p>A short-form edit dedicated to Marcus Thuram: athletic movement, presence and character, translated into a visually engaging story built for social platforms. <span class="dim">Where motion meets identity.</span></p>
+      <div>
+        <p class="mono">Toolkit</p>
+        <ul class="tools mono"><li>Filmora</li><li>DaVinci Resolve</li><li>Premiere Pro</li><li>CapCut</li><li>Procreate</li></ul>
+        <p style="margin-top:24px"><a class="mono ulink" href="{TIKTOK}" target="_blank" rel="noopener">Watch on TikTok {ARROW}</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter" id="web" aria-labelledby="web-title">
+    <header class="chapter__head rv">
+      <p class="chapter__n mono">04 — Web design</p>
+      <h2 class="chapter__title" id="web-title">Web<span class="serif">sites</span></h2>
+      <p class="chapter__lede">Two internships at <a class="ulink" href="https://www.officina48.it" target="_blank" rel="noopener"><strong>Officina48</strong></a>: WordPress and Elementor for local brands, then a central role on <strong>municipal and institutional websites</strong> — clarity, usability and reliability for public communication.</p>
+    </header>
+    <div class="browsers">
+        {browsers}
+    </div>
+  </section>
+
+  <section class="chapter" id="about" aria-labelledby="about-title">
+    <header class="chapter__head rv">
+      <p class="chapter__n mono">05 — About</p>
+      <h2 class="chapter__title" id="about-title">The <span class="serif">story</span></h2>
+    </header>
+    <div class="about">
+      <figure class="about__photo rv">{img(about[0], "Lorenzo on graduation day, wearing a laurel wreath")}<figcaption class="mono dim">Graduation day — Reggio Emilia</figcaption></figure>
+      <div class="about__body">
+        <p class="about__big rv">At 18 I didn’t know what to do with my life. I only knew technology had always been part of it — <em>and probably always will be.</em></p>
+        <ol class="timeline">
+          <li class="rv"><span class="mono dim">University</span><div><h3>Unimore — Digital Marketing</h3><p>Department of Communication and Economics, Reggio Emilia. Three years of video editing, programmatic, graphic design, web development and ad strategy. I learned what I like — and, more importantly, what I don’t.</p></div></li>
+          <li class="rv"><span class="mono dim">Internships</span><div><h3>Officina48 S.n.C.</h3><p>A real creative workflow: content, visual design and WordPress layouts for local businesses, then municipal websites across the territory.</p></div></li>
+          <li class="rv"><span class="mono dim">Now</span><div><h3>Social Media Manager — APM</h3><p>Second season with AtleticProgettoMontagna: match photography, graphics and social content.</p></div></li>
+          <li class="rv"><span class="mono dim">Side project</span><div><h3>Dsgn.pop</h3><p>My Instagram page about design, where I keep practising in public.</p></div></li>
+          <li class="rv"><span class="mono dim">Approach</span><div><h3>AI as a helper</h3><p>I use AI to simplify and speed up the work — never to replace the idea.</p></div></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter" id="services" aria-labelledby="services-title">
+    <header class="chapter__head rv">
+      <p class="chapter__n mono">06 — Services</p>
+      <h2 class="chapter__title" id="services-title">How I can <span class="serif">help</span></h2>
+    </header>
+    <div class="services rv">
+      <div class="service"><p class="mono dim">01</p><h3>Shooting</h3><ul><li>Photo shoots</li><li>Post-production</li><li>Publishing advice</li></ul></div>
+      <div class="service"><p class="mono dim">02</p><h3>Design</h3><ul><li>Posters</li><li>Interfaces</li><li>Presentations</li><li>Carousels</li></ul></div>
+      <div class="service"><p class="mono dim">03</p><h3>Video editing</h3><ul><li>Video production</li><li>Post-production</li><li>Publishing advice</li></ul></div>
+      <div class="service"><p class="mono dim">04</p><h3>Websites</h3><ul><li>UX/UI design</li><li>Figma &amp; Framer</li><li>WordPress</li></ul></div>
+    </div>
+  </section>
+
+  <section class="contact" id="contact" aria-labelledby="contact-title">
+    <div class="contact__lead">
+      <p class="mono dim" id="contact-title">07 — Contact</p>
+      <p>Have an idea worth building? Let’s turn it into something people notice. Open to collaborations, freelance projects and bold concepts where design and strategy collide.</p>
+    </div>
+    <button class="mail" type="button" data-copy="lorenzodevicienti@gmail.com" aria-label="Copy email address lorenzodevicienti@gmail.com"><span>lorenzodevicienti@gmail.com</span></button>
+    <p class="mail__hint">Click to copy · or <a class="ulink" href="mailto:lorenzodevicienti@gmail.com">open your mail app</a></p>
+    <div class="contact__grid">
+      <div><span class="mono">Phone</span><a class="ulink" href="tel:+393337111353">+39 333 711 1353</a></div>
+      <div><span class="mono">Based in</span>Carrer de Londres, 23<br>Barcelona</div>
+      <div><span class="mono">Elsewhere</span><a class="ulink" href="{IG}" target="_blank" rel="noopener">Dsgn.pop</a><br><a class="ulink" href="{IG_ME}" target="_blank" rel="noopener">Instagram</a><br><a class="ulink" href="{LI}" target="_blank" rel="noopener">LinkedIn</a></div>
+      <div><span class="mono">© <span data-year>2026</span></span>Lorenzo Devicienti<br><a class="ulink" href="#top">Back to top ↑</a></div>
+    </div>
+  </section>
+</main>
+
+<dialog class="lb" aria-label="Photo viewer">
+  <img alt="">
+  <button class="lb__close mono" type="button">Close ✕</button>
+  <div class="lb__ui mono">
+    <button class="lb__prev" type="button" aria-label="Previous photo">← Prev</button>
+    <span><span class="lb__cap"></span> · <span class="lb__count"></span></span>
+    <button class="lb__next" type="button" aria-label="Next photo">Next →</button>
+  </div>
+</dialog>
+<div class="toast mono" role="status" aria-live="polite"></div>
+</body>
+</html>
+"""
+from i18n import LANGS, MOTTO, JS, translate
+
+LOCALES = {"en": "en_GB", "it": "it_IT", "es": "es_ES"}
+
+
+def motto_html(lang):
+    m = MOTTO[lang]
+    out = [f'    <h1 class="motto__text" aria-label="{m["label"]}">']
+    for kind in ("w", "n"):
+        for text, tone in m[kind]:
+            cls = f"motto__line motto__line--{kind}" + (f" motto__line--{tone}" if tone else "")
+            out.append(f'      <span class="{cls}" aria-hidden="true">{text}</span>')
+    out.append("    </h1>\n")
+    return "\n".join(out)
+
+
+for lang, info in LANGS.items():
+    up = "../" if info["path"] else ""
+    page = translate(html, lang)
+    switch = '<nav class="lang" aria-label="Language">' + "".join(
+        f'<a href="{up}{o["path"] or "./"}" hreflang="{code}" lang="{code}" title="{o["name"]}"'
+        + (' aria-current="true"' if code == lang else "") + f'>{o["short"]}</a>'
+        for code, o in LANGS.items()) + "</nav>"
+    hreflang = "\n".join(f'<link rel="alternate" hreflang="{code}" href="{SITE}{o["path"]}">' for code, o in LANGS.items())
+    hreflang += f'\n<link rel="alternate" hreflang="x-default" href="{SITE}">'
+    jsdata = " ".join(f'data-t-{k}="{v}"' for k, v in JS[lang].items())
+    page = (page.replace("@@MOTTO@@", motto_html(lang)).replace("@@LANG@@", switch).replace("@@HREFLANG@@", hreflang)
+                .replace("@@HTMLLANG@@", lang).replace("@@JSDATA@@", jsdata)
+                .replace("@@CANON@@", SITE + info["path"]).replace("@@LOCALE@@", LOCALES[lang]))
+    if up:
+        page = page.replace('href="assets/', 'href="../assets/').replace('src="assets/', 'src="../assets/')
+    os.makedirs(os.path.join(REPO, info["path"]), exist_ok=True)
+    open(os.path.join(REPO, info["path"], "index.html"), "w").write(page)
+
+# --- Pagina 404 (indirizzi assoluti: viene servita su qualunque percorso)
+BASE = "/LorenzoWebSite/"
+not_found = f"""<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{full}</title>
-<meta name="description" content="{desc}">
-<link rel="canonical" href="{PAGES_URL}{path}">
-<meta property="og:type" content="website">
-<meta property="og:title" content="{full}">
-<meta property="og:description" content="{desc}">
-<meta property="og:image" content="{PAGES_URL}assets/img/og-image.jpg">
-<meta property="og:url" content="{PAGES_URL}{path}">
-<meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="{root}assets/img/favicon.png" type="image/png">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Page not found · Lorenzo Devicienti</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0c0c0b">
+<link rel="icon" href="{BASE}assets/img/favicon.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;800&family=Manrope:wght@500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{root}assets/css/style.css">
-<script src="{root}assets/js/main.js" defer></script>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{BASE}assets/css/style.css">
+<script src="{BASE}assets/js/main.js" defer></script>
 </head>
 <body>
-<a class="skip-link" href="#main">Skip to content</a>
-"""
-
-
-def header(root, current):
-    items = []
-    for href, label in NAV:
-        cur = ' aria-current="page"' if href == current else ""
-        items.append(f'<li><a href="{root}{href}"{cur}>{label}</a></li>')
-    cur = ' aria-current="page"' if current == "contact/" else ""
-    items.append(f'<li class="only-mobile"><a href="{root}contact/"{cur}>Contact</a></li>')
-    return f"""<header class="site-header">
-  <div class="site-header__inner">
-    <a class="site-header__brand" href="{root}">Lorenzo Devicienti</a>
-    <nav class="site-nav" aria-label="Main">
-      <ul>
-        {chr(10).join('        ' + i for i in items).strip()}
-      </ul>
-    </nav>
-    <a class="site-header__cta" href="{root}contact/">Let’s talk</a>
-  </div>
+<header class="bar">
+  <a class="bar__name" href="{BASE}">Lorenzo Devicienti</a>
 </header>
-"""
-
-
-def footer(root, plain=False):
-    if plain:
-        return f"""<footer class="site-footer site-footer--plain">
-  <div class="wrap"><p class="site-footer__copy">© <span data-year>2026</span> · crafted by Lorenzo Devicienti</p></div>
-</footer>
+<main>
+  <section class="motto" aria-label="Page not found">
+    <h1 class="motto__text" aria-label="Error 404: this page doesn’t exist, or has been moved.">
+      <span class="motto__line" aria-hidden="true">Error 404:</span>
+      <span class="motto__line motto__line--dim" aria-hidden="true">this page doesn’t</span>
+      <span class="motto__line motto__line--accent" aria-hidden="true">exist (yet).</span>
+    </h1>
+    <div class="motto__foot">
+      <p class="mono">Page not found</p>
+      <p class="motto__intro">The page you’re looking for doesn’t exist or has been moved. Everything is on the home page now.</p>
+      <a class="mono motto__cta ulink" href="{BASE}">Go to home {ARROW}</a>
+    </div>
+  </section>
+</main>
 </body>
 </html>
 """
-    links = [("", "Home"), ("photo/", "Photo"), ("graphics/", "Graphics"), ("video/", "Video"),
-             ("web-site/", "Website"), ("about/", "About"), ("contact/", "Contact")]
-    nav = "\n".join(f'          <li><a href="{root}{h}">{t}</a></li>' for h, t in links)
-    return f"""<footer class="site-footer">
-  <div class="wrap">
-    <div class="site-footer__grid">
-      <div>
-        <p class="label">Contact</p>
-        <p class="site-footer__title">Let’s start creating together</p>
-        {pill(root + "contact/", "Let’s talk", cls="pill pill--light")}
-      </div>
-      <nav aria-label="Footer">
-        <ul class="site-footer__nav">
-{nav}
-        </ul>
-      </nav>
-      <ul class="site-footer__social">
-        <li><a class="link-row" href="{IG_PORTFOLIO}" target="_blank" rel="noopener">Instagram Portfolio {ARROW}</a></li>
-        <li><a class="link-row" href="{LINKEDIN}" target="_blank" rel="noopener">LinkedIn {ARROW}</a></li>
-        <li><a class="link-row" href="{IG_PERSONAL}" target="_blank" rel="noopener">Instagram {ARROW}</a></li>
-      </ul>
-    </div>
-    <p class="site-footer__mega" aria-hidden="true">Lorenzo Devicienti</p>
-    <div class="site-footer__bottom">
-      <p class="site-footer__copy">© <span data-year>2026</span> · crafted by Lorenzo Devicienti</p>
-      <a class="site-footer__top" href="#main">Back to top ↑</a>
-    </div>
-  </div>
-</footer>
+open(os.path.join(REPO, "404.html"), "w").write(not_found)
+
+# --- Vecchi indirizzi del sito a più pagine: portano alla sezione giusta
+for old, anchor in [("about", "about"), ("photo", "photo"), ("graphics", "graphics"), ("video", "video"),
+                    ("web-site", "web"), ("contact", "contact")]:
+    os.makedirs(os.path.join(REPO, old), exist_ok=True)
+    open(os.path.join(REPO, old, "index.html"), "w").write(f"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lorenzo Devicienti</title>
+<meta name="robots" content="noindex">
+<link rel="canonical" href="{SITE}#{anchor}">
+<meta http-equiv="refresh" content="0; url=../#{anchor}">
+</head>
+<body style="background:#0c0c0b;color:#edece7;font-family:system-ui,sans-serif">
+<p><a href="../#{anchor}" style="color:inherit">This page has moved. Continue to Lorenzo Devicienti</a></p>
 </body>
 </html>
-"""
-
-
-def services():
-    data = [("Shooting", ["Photo Shoots", "Post-Production", "Publishing Advice"]),
-            ("Design", ["Posters", "Interfaces", "Presentations", "Carousels"]),
-            ("Video Editing", ["Video Production", "Post-Production", "Publishing Advice"]),
-            ("Web Site", ["UX/UI Design", "Figma and Framer", "WordPress"])]
-    rows = []
-    for n, (t, items) in enumerate(data, 1):
-        lis = "".join(f"<li>{i}</li>" for i in items)
-        rows.append(f'      <details class="service"><summary><span class="service__num">0{n}</span><span class="service__title">{t}</span>{CHEVRON}</summary><div class="service__body"><ul>{lis}</ul></div></details>')
-    return f"""<section class="section services reveal" aria-labelledby="services-title">
-  <div class="wrap">
-    <h2 class="label" id="services-title">Services</h2>
-    <div class="services__list">
-{chr(10).join(rows)}
-    </div>
-  </div>
-</section>
-"""
-
-
-def statement(label, html, button, narrow=False, wrap="wrap"):
-    cls = "statement statement--narrow" if narrow else "statement"
-    return f"""<section class="section reveal">
-  <div class="{wrap}">
-    <div class="{cls}">
-      <p class="label">{label}</p>
-      <p class="statement__text">{html}</p>
-      {button}
-    </div>
-  </div>
-</section>
-"""
-
-
-def ticker(root, files, alt, h, duration):
-    imgs = "".join(img(root, f, alt) for f in files)
-    dup = "".join(img(root, f, "", extra=' aria-hidden="true"') for f in files)
-    return f"""<div class="ticker" style="--h:{h}px;--duration:{duration}s">
-  <div class="ticker__track">{imgs}<span aria-hidden="true" style="display:contents">{dup}</span></div>
-</div>"""
-
-
-def photo_carousel(root, files, alt, label):
-    imgs = "\n      ".join(img(root, f, alt) for f in files)
-    return f"""<div class="carousel carousel--photos" role="region" aria-label="{label}">
-    <button class="carousel__btn carousel__btn--prev" type="button" aria-label="Previous photos">{LEFT}</button>
-    <div class="carousel__track" tabindex="0">
-      {imgs}
-    </div>
-    <button class="carousel__btn carousel__btn--next" type="button" aria-label="Next photos">{RIGHT}</button>
-    <p class="carousel__count" aria-hidden="true"><span data-current>01</span> / {len(files):02d}</p>
-  </div>"""
-
-
-def write(path, html):
-    full = os.path.join(REPO, path)
-    os.makedirs(os.path.dirname(full), exist_ok=True)
-    open(full, "w").write(html)
-
-
-# ---------------------------------------------------------------- HOME
-r = ""
-h = M["home_d"]
-home = head(r, "", DESC, "") + header(r, "") + f"""<main id="main">
-<section class="hero">
-  <div class="wrap">
-    <p class="label">Portfolio · Lorenzo Devicienti</p>
-    <blockquote class="hero__quote" data-split>“To get something you don’t have,<br> <span class="muted">you have to do something you’ve never done before.”</span></blockquote>
-    <p class="hero__author">— Mirko Martorana</p>
-    <ul class="hero__meta">
-      <li><span class="status-dot" aria-hidden="true"></span>Available for new projects</li>
-      <li>Photo · Graphics · Video · Web</li>
-      <li>Based in Barcelona</li>
-    </ul>
-  </div>
-</section>
-
-<section class="wrap projects" aria-label="Selected work">
-  <a data-cursor="View" class="project project--wide project--hero reveal" href="graphics/">
-    <div class="project__media">{img(r, h[0]['file'], 'Graphic posts “Jago’s David is a Woman” and “Echoverse” from the Dsgn.pop page', lazy=False)}<span class="project__badge">{ARROW}</span></div>
-    <div class="project__meta"><div><p class="project__kicker">Design Pop</p><h2 class="project__title">Graphic Posts</h2></div><span class="project__num">01</span></div>
-  </a>
-  <a data-cursor="View" class="project reveal" href="photo/#felina">
-    <div class="project__media">{img(r, h[1]['file'], 'Felina F.C. player running through coloured smoke')}<span class="project__badge">{ARROW}</span></div>
-    <div class="project__meta"><div><p class="project__kicker">Felina F.C.</p><h2 class="project__title">Sport Photography</h2></div><span class="project__num">02</span></div>
-  </a>
-  <a data-cursor="View" class="project reveal" href="photo/#portraits">
-    <div class="project__media">{img(r, h[2]['file'], 'Portrait of a young man in profile')}<span class="project__badge">{ARROW}</span></div>
-    <div class="project__meta"><div><p class="project__kicker">Friends</p><h2 class="project__title">Portraits</h2></div><span class="project__num">03</span></div>
-  </a>
-  <a data-cursor="View" class="project project--wide reveal" href="web-site/">
-    <div class="project__media">{img(r, h[3]['file'], 'Homepage of the Castelnovo ne’ Monti municipality website')}<span class="project__badge">{ARROW}</span></div>
-    <div class="project__meta"><div><p class="project__kicker">Municipality of Castelnovo ne’ Monti</p><h2 class="project__title">Municipal Website</h2></div><span class="project__num">04</span></div>
-  </a>
-</section>
-
-{statement("Designing Success", 'To improve and continue my passion for design, I created the Dsgn.pop page <span class="muted">where I publish posts about design.</span>', pill(IG_PORTFOLIO, "Profile", True))}
-{services()}</main>
-""" + footer(r)
-write("index.html", home)
-
-# ---------------------------------------------------------------- ABOUT
-r = "../"
-a = M["about_d"]
-about = head(r, "About", "From uncertainty about the future to a degree in Digital Marketing: the story behind Lorenzo Devicienti’s work.", "about/") + header(r, "about/") + f"""<main id="main">
-<section class="page-top">
-  <div class="wrap wrap--1100">
-    <p class="label">About Me</p>
-    <h1 class="title-xl">It all started with uncertainty <span class="muted">about the future.</span></h1>
-    <div class="stack" style="margin-top:40px">
-      <p class="lead">When I was 18, I didn’t know what to do with my life.<br>I just knew that technology had always been a part of my life, <span class="muted">and probably always will be.</span></p>
-      <p class="lead">So, after graduating from high school, I enrolled at university, in the <span class="muted">Digital Marketing</span> course at <span class="muted">Unimore, in the Department of Communication and Economics in Reggio Emilia.</span></p>
-    </div>
-  </div>
-</section>
-
-<section class="section reveal" aria-label="Graduation day">
-  {ticker(r, [x['file'] for x in a[:4]], 'Graduation day in Reggio Emilia', 400, 35)}
-</section>
-
-<section class="reveal">
-  <div class="wrap wrap--800">
-    <p class="label">About Me</p>
-    <h2 class="title-xl">My University <span class="muted">experience</span></h2>
-    <div class="stack" style="margin-top:32px">
-      <p class="lead">During my three years at university, I learned the trade of a digital marketer: video editing, programmatic advertising, graphic design, web development and ad strategy.</p>
-      <p class="lead">I learned what I like, but more importantly, what I don’t. <span class="muted">I grew professionally and personally.</span></p>
-      <p class="lead">I also broadened my horizons thanks to the <span class="muted">use of AI, which I learned to use as a helper to simplify my work and make everything more efficient</span>, rather than replacing me.</p>
-    </div>
-  </div>
-</section>
-
-<section class="section reveal">
-  <div class="wrap wrap--940">
-    <div class="figure">{img(r, a[4]['file'], 'Illustration of a person meditating in front of AI company logos')}</div>
-  </div>
-</section>
-
-{services()}
-{statement("Let’s Talk!", 'If you are looking for a highly personalized project and need creative help to bring it to life, I would be thrilled to be part of it. <span class="muted">Let’s create together!</span>', pill(r + "contact/", "Contact Me"), narrow=True)}</main>
-""" + footer(r)
-write("about/index.html", about)
-
-# ---------------------------------------------------------------- PHOTO
-p = M["photo_d"]
-def group(y):
-    g = sorted([x for x in p if x['y'] == y], key=lambda x: x['x'])
-    i = next((k for k, x in enumerate(g) if x['x'] >= 200), 0)
-    return [x['file'] for x in g[i:] + g[:i]]
-photo = head(r, "Photo", "Sport photography for AtleticProgettoMontagna and Felina F.C., and portraits by Lorenzo Devicienti.", "photo/") + header(r, "photo/") + f"""<main id="main">
-<section class="page-top">
-  <div class="wrap wrap--1100">
-    <h1 class="title-xl">Sport Photo Shooting</h1>
-    <div class="stack" style="margin-top:24px">
-      <p class="lead">This is my second year working with the AtleticProgettoMontagna sports club as Social Media Manager, <span class="muted">and I have done various photo shoots during matches</span>.</p>
-      <p class="lead">Here are some of the shots…</p>
-    </div>
-  </div>
-</section>
-
-<section class="section reveal">
-  <div class="wrap wrap--1100">
-  {photo_carousel(r, group(860), 'AtleticProgettoMontagna match photo', 'AtleticProgettoMontagna photos')}
-  </div>
-</section>
-
-<section id="felina" class="reveal">
-  <div class="wrap wrap--940">
-    <p class="lead">During the summer, I took several photos of the Felina F.C. sports club <span class="muted">as they competed in an important summer tournament</span>.</p>
-    <p class="lead">Here are some of the shots…</p>
-  </div>
-</section>
-
-<section class="section reveal">
-  <div class="wrap wrap--1100">
-  {photo_carousel(r, group(2065), 'Felina F.C. summer tournament photo', 'Felina F.C. photos')}
-  </div>
-</section>
-
-<section id="portraits" class="reveal">
-  <div class="wrap wrap--1100">
-    <h2 class="title-xl">Portraits of people</h2>
-    <div class="stack" style="margin-top:24px">
-      <p class="lead">Over the past year, I’ve had the opportunity to photograph people, <span class="muted">which is something I really enjoy doing</span>.</p>
-      <p class="lead">Here are some of the shots…</p>
-    </div>
-  </div>
-</section>
-
-<section class="section reveal">
-  <div class="wrap wrap--1100">
-  {photo_carousel(r, group(3365), 'Portrait photo', 'Portrait photos')}
-  </div>
-</section>
-
-{statement("Let’s Talk!", 'If you are interested in my work and would like a personalized photo shoot, <span class="muted">let’s talk and create something together!</span>', pill(r + "contact/", "Contact Me"))}</main>
-""" + footer(r)
-write("photo/index.html", photo)
-
-# ---------------------------------------------------------------- GRAPHICS
-g = M["graphics_d"]
-graphics = head(r, "Graphics", "Graphic design by Lorenzo Devicienti for the APM sports club and the Dsgn.pop Instagram page.", "graphics/") + header(r, "graphics/") + f"""<main id="main">
-<section class="page-top">
-  <div class="wrap wrap--940">
-    <h1 class="title-xl">Designing Success</h1>
-    <div class="stack" style="margin-top:24px">
-      <p class="lead">Graphic design is one of those things that has always fascinated me, and something I often enjoy doing.</p>
-      <p class="lead">I had the opportunity to create graphics for the APM sports club, and I also opened my own portfolio page on Instagram, called Dsgn.pop.</p>
-    </div>
-  </div>
-</section>
-
-<section class="section reveal" aria-label="Graphic posts">
-  {ticker(r, [x['file'] for x in g], 'Graphic post by Lorenzo Devicienti', 370, 45)}
-</section>
-
-{statement("The Page", 'Besides working with the APM sports club, I share my graphic work on <span class="muted">my Instagram portfolio page, Dsgn.pop.</span>', pill(IG_PORTFOLIO, "Follow Me", True), narrow=True, wrap="wrap wrap--940")}
-{statement("Let’s Talk", 'If you need graphics for your business or for an event, <span class="muted">let’s create them together!</span>', pill(r + "contact/", "Contact Me"), narrow=True, wrap="wrap wrap--940")}</main>
-""" + footer(r)
-write("graphics/index.html", graphics)
-
-# ---------------------------------------------------------------- VIDEO
-v = M["video_d"]
-video = head(r, "Video", "Short-form video editing by Lorenzo Devicienti: rhythm, pacing and storytelling for social platforms.", "video/") + header(r, "video/") + f"""<main id="main">
-<section class="page-top">
-  <div class="wrap">
-    <h1 class="title-xl">Video Editing</h1>
-    <p class="lead" style="margin-top:24px">Built on Rhythm, <span class="muted">Crafted for Visual Impact</span>.</p>
-  </div>
-</section>
-
-<section class="reveal" style="padding-top:64px">
-  <div class="wrap">
-    <div class="frame" style="max-width:810px;margin:0 auto">{img(r, v[0]['file'], 'Frames from the Marcus Thuram edit: “Goal” and “Tu-Tu”', lazy=False)}</div>
-    <div class="text-cta" style="margin-top:48px">
-      <p class="body-l">Short-form edit dedicated to Marcus Thuram, built to enhance rhythm, intensity and visual impact through fast cuts, beat-driven transitions and dynamic pacing. The video focuses on athletic movement, presence and character, translating football performance into a visually engaging narrative suited for social platforms.</p>
-      {pill(TIKTOK, "Video", True)}
-    </div>
-  </div>
-</section>
-
-<section class="section reveal">
-  <div class="wrap">
-    <div class="projects" style="padding-top:0;gap:40px 120px;max-width:1150px;margin:0 auto">
-      <div class="frame">{img(r, v[1]['file'], 'Frame from the edit: “Tu-Tu” celebration')}</div>
-      <div class="frame">{img(r, v[2]['file'], 'Frame from the edit: “Thuram” title in the stadium')}</div>
-    </div>
-    <div class="text-cta" style="margin-top:56px">
-      <p class="body-l">This edit was produced using Filmora, with full awareness of platform-specific formats and engagement logic (TikTok-first). Beyond this project, I am fully capable of working with DaVinci Resolve, Adobe Premiere Pro, CapCut and Procreate, adapting my workflow to advanced colour grading, professional timelines, and creative motion or graphic-driven edits, depending on the project’s needs.</p>
-      {pill(TIKTOK, "Video", True)}
-    </div>
-    <p class="body-l" style="margin-top:72px;max-width:1100px">The goal was not only technical execution, but storytelling through motion, music and timing — turning performance into emotion.</p>
-    <p class="lead" style="margin-top:40px">Where Motion <span class="muted">Meets Identity</span>.</p>
-  </div>
-</section>
-</main>
-""" + footer(r)
-write("video/index.html", video)
-
-# ---------------------------------------------------------------- WEB SITE
-w = M["web_site_d"]
-def shots(items):
-    out = []
-    for f, alt, href, label in items:
-        btn = f'<div class="site-shot__links">{pill(href, label, True)}</div>' if href else ""
-        out.append(f'<div><div class="site-shot">{img(r, f, alt)}</div>{btn}</div>')
-    return "\n      ".join(out)
-web = head(r, "Web Site", "Web development by Lorenzo Devicienti: WordPress and Elementor websites for local brands and municipalities.", "web-site/") + header(r, "web-site/") + f"""<main id="main">
-<section class="page-top">
-  <div class="wrap wrap--940">
-    <h1 class="title-xl">Web Development</h1>
-    <div class="stack" style="margin-top:24px">
-      <p class="lead">During university, I was fortunate enough to do two <span class="muted">extracurricular internships</span>.</p>
-      <p class="lead">I did them at Officina48 S.n.C., where I had the opportunity <span class="muted">to learn how to use WordPress and Elementor.</span></p>
-    </div>
-    <p style="margin-top:40px">{pill("https://www.officina48.it", "Officina48 S.n.C.", True)}</p>
-  </div>
-</section>
-
-<section class="section reveal">
-  <div class="wrap wrap--940">
-    <div class="sites">
-      {shots([(w[0]['file'], 'AGLF Education website, homepage', None, None), (w[1]['file'], 'AGLF Education website, study abroad page', None, None), (w[2]['file'], 'AGLF Education website, programme page', None, None)])}
-    </div>
-    <p style="margin-top:32px">{pill("https://www.aglf.academy", "AGLF", True)}</p>
-    <div class="stack" style="margin-top:40px">
-      <p class="lead">During my internship at Officina48, I worked inside a real creative workflow, collaborating <span class="muted">on digital projects for local brands and businesses</span>.</p>
-      <p class="lead">I was involved in content creation, visual design and website development, contributing to social media materials, graphic assets and WordPress-based layouts.</p>
-      <p class="body-l">This experience taught me how ideas move from concept to execution, how deadlines shape creativity, and how design must always serve a clear objective. It was a hands-on environment where <span class="muted">precision, adaptability and problem-solving</span> mattered as much as aesthetics.</p>
-      <p>Screenshots above: <span class="muted">AGLF Education</span></p>
-    </div>
-  </div>
-</section>
-
-<section class="reveal">
-  <div class="wrap wrap--940">
-    <div class="sites">
-      {shots([(w[3]['file'], 'Castelnovo ne’ Monti municipality website', 'https://www.comune.castelnovo-nemonti.re.it', 'Castelnovo ne’ Monti'), (w[4]['file'], 'Casina municipality website', 'https://www.comune.casina.re.it', 'Casina'), (w[5]['file'], 'Villa Minozzo municipality website', 'https://www.comune.villa-minozzo.re.it', 'Villa Minozzo')])}
-    </div>
-    <div class="stack" style="margin-top:56px">
-      <p class="lead">During my second internship, <span class="muted">I took on a more central role in web projects</span>, working extensively on municipal and institutional websites across the local area.</p>
-      <p class="lead">I was involved in structuring pages, managing content, and supporting the development of clear, accessible digital interfaces designed <span class="muted">for public communication.</span></p>
-      <p class="lead">This phase strengthened my understanding of real-world workflows, responsibility, and the importance of clarity, usability and reliability in digital design.</p>
-    </div>
-  </div>
-</section>
-
-{statement("Let’s Talk", 'If you need a website for your business or for an event, <span class="muted">let’s create it together!</span>', pill(r + "contact/", "Contact Me"), narrow=True, wrap="wrap wrap--940")}</main>
-""" + footer(r)
-write("web-site/index.html", web)
-
-# ---------------------------------------------------------------- CONTACT
-contact = head(r, "Contact", "Get in touch with Lorenzo Devicienti for photography, graphic design, video editing and websites.", "contact/") + header(r, "contact/") + f"""<main id="main">
-<section class="page-top">
-  <div class="wrap">
-    <div class="contact">
-      <div>
-        <p class="label label--grey" style="font-size:18px">Contact Me</p>
-        <h1 class="title-xl" style="margin-top:24px">Get in touch</h1>
-        <div class="contact__intro body-l" style="margin-top:32px;max-width:800px">
-          <p>Have an idea worth building?</p>
-          <p>Let’s turn it into something people notice.<br>Open to collaborations, freelance projects, and bold concepts where design and strategy collide.</p>
-          <p>If you’re ready to do something different, you know where to find me.</p>
-        </div>
-        <dl class="contact__details">
-          <div><dt>Email</dt><dd><a class="link-row" href="mailto:lorenzodevicienti@gmail.com">lorenzodevicienti@gmail.com {ARROW}</a></dd></div>
-          <div><dt>Phone</dt><dd><a href="tel:+393337111353">+39 333 711 1353</a></dd></div>
-          <div><dt>Address</dt><dd>Carrer de Londres, 23<br>Barcelona</dd></div>
-        </dl>
-      </div>
-      <ul>
-        <li><a class="link-row" href="{LINKEDIN}" target="_blank" rel="noopener">LinkedIn {ARROW}</a></li>
-        <li><a class="link-row" href="{IG_PERSONAL}" target="_blank" rel="noopener">Instagram Personal {ARROW}</a></li>
-        <li><a class="link-row" href="{IG_PORTFOLIO}" target="_blank" rel="noopener">Instagram Portfolio {ARROW}</a></li>
-      </ul>
-    </div>
-  </div>
-</section>
-</main>
-""" + footer(r, plain=True)
-write("contact/index.html", contact)
-
-# ---------------------------------------------------------------- 404
-r = "/LorenzoWebSite/"
-nf = head(r, "Page not found", "This page doesn’t exist or has been moved.", "404.html").replace('<meta name="description"', '<meta name="robots" content="noindex">\n<meta name="description"') + header(r, "") + f"""<main id="main">
-<section class="page-top">
-  <div class="wrap">
-    <h1 class="title-xl" style="max-width:800px">Oops. It looks like the page you’re trying to reach <span class="muted">doesn’t exist</span> or has been moved.</h1>
-    <p style="margin-top:48px">{pill(r, "Go to home")}</p>
-  </div>
-</section>
-</main>
-""" + footer(r)
-write("404.html", nf)
-
-print("ok")
+""")
+print("ok", total)
