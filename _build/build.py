@@ -145,8 +145,8 @@ html = f"""<!doctype html>
 <main id="top">
   <section class="motto" aria-label="Motto">
 @@MOTTO@@    <div class="motto__foot">
-      <p class="mono">— Mirko Martorana</p>
-      <p class="motto__intro"><strong>Lorenzo Devicienti</strong>. Photography, graphic design, video editing and websites. Social Media Manager at AtleticProgettoMontagna, founder of Dsgn.pop.</p>
+      <p class="motto__cite mono">A quote by <cite>Mirko Martorana</cite></p>
+      <h1 class="motto__intro"><strong>I’m Lorenzo Devicienti.</strong> I work with photography, graphic design, video editing and websites. Social Media Manager at AtleticProgettoMontagna, founder of Dsgn.pop.</h1>
       <a class="mono motto__cta" href="#index">See the work <svg width="10" height="12" viewBox="0 0 10 12" aria-hidden="true"><path d="M5 0v11M1 7l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></a>
     </div>
   </section>
@@ -300,12 +300,13 @@ LOCALES = {"en": "en_GB", "it": "it_IT", "es": "es_ES"}
 
 def motto_html(lang):
     m = MOTTO[lang]
-    out = [f'    <h1 class="motto__text" aria-label="{m["label"]}">']
+    # Il motto è una citazione (di Mirko Martorana), non il titolo della pagina: blockquote, non h1
+    out = ['    <blockquote class="motto__text">', f'      <span class="sr-only">{m["label"].split(" — ")[0]}</span>']
     for kind in ("w", "n"):
         for text, tone in m[kind]:
             cls = f"motto__line motto__line--{kind}" + (f" motto__line--{tone}" if tone else "")
             out.append(f'      <span class="{cls}" aria-hidden="true">{text}</span>')
-    out.append("    </h1>\n")
+    out.append("    </blockquote>\n")
     return "\n".join(out)
 
 

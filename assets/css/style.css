@@ -563,3 +563,9 @@ body.menu-open { overflow: hidden; }
   .bar__menu-icon { display: block; }
   .bar__meta { gap: 8px; }
 }
+
+/* Il motto è una citazione: autore ben visibile, separato dalla presentazione */
+.motto__cite { color: var(--ink-3); }
+.motto__cite cite { font-style: normal; color: var(--ink); }
+h1.motto__intro { font-weight: 400; margin: 0; }
+h1.motto__intro strong { font-weight: 700; color: var(--ink); }
