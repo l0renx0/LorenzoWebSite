@@ -569,3 +569,14 @@ body.menu-open { overflow: hidden; }
 .motto__cite cite { font-style: normal; color: var(--ink); }
 h1.motto__intro { font-weight: 400; margin: 0; }
 h1.motto__intro strong { font-weight: 700; color: var(--ink); }
+
+/* Indice dei lavori: più respiro sopra, sotto e tra le righe */
+.index { padding-block: clamp(120px, 14vw, 220px) clamp(40px, 6vw, 96px); }
+.index__head { padding-bottom: 18px; }
+.row { padding-block: clamp(22px, 2.4vw, 36px); }
+.row__t { line-height: .95; }
+#photo { padding-top: clamp(140px, 16vw, 260px); }
+@media (max-width: 560px) {
+  .index { padding-block: 96px 24px; }
+  .row { padding-block: 22px; }
+}
