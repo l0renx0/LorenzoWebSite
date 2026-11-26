@@ -62,6 +62,14 @@ posters = "\n        ".join(
     f'<figure class="poster">{img(f, f"Graphic post {i+1:02d}")}</figure>'
     for i, f in enumerate(graphics))
 
+# --- Video da TikTok: incolla qui gli ID (il numero finale dei link tiktok.com/@that.one.film/video/ID)
+TIKTOK_VIDEOS = []
+tt_videos = "\n        ".join(
+    f'<figure class="clip"><iframe src="https://www.tiktok.com/player/v1/{v}?description=0&music_info=0&rel=0" '
+    f'title="TikTok video {i+1}" loading="lazy" allow="fullscreen; encrypted-media" allowfullscreen></iframe></figure>'
+    for i, v in enumerate(TIKTOK_VIDEOS))
+tt_block = f'<div class="clips rv">\n        {tt_videos}\n    </div>\n' if TIKTOK_VIDEOS else ""
+
 # --- Browser
 def browser(f, url, name, href):
     return (f'<figure class="browser rv"><div class="browser__bar"><span class="browser__dots"><i></i><i></i><i></i></span>'
@@ -116,10 +124,11 @@ html = f"""<!doctype html>
   <ol class="menu__list">
     <li><a href="#photo"><span class="mono">01</span>Photography</a></li>
     <li><a href="#graphics"><span class="mono">02</span>Graphic design</a></li>
-    <li><a href="#web"><span class="mono">03</span>Websites</a></li>
-    <li><a href="#about"><span class="mono">04</span>About</a></li>
-    <li><a href="#services"><span class="mono">05</span>Services</a></li>
-    <li><a href="#contact"><span class="mono">06</span>Contact</a></li>
+    <li><a href="#video"><span class="mono">03</span>Video editing</a></li>
+    <li><a href="#web"><span class="mono">04</span>Websites</a></li>
+    <li><a href="#about"><span class="mono">05</span>About</a></li>
+    <li><a href="#services"><span class="mono">06</span>Services</a></li>
+    <li><a href="#contact"><span class="mono">07</span>Contact</a></li>
   </ol>
   <div class="menu__foot mono">
     <a href="{IG}" target="_blank" rel="noopener">Dsgn.pop</a>
@@ -144,7 +153,8 @@ html = f"""<!doctype html>
     <div class="index__head mono dim" aria-hidden="true"><span>No.</span><span>Discipline</span><span>Highlights</span><span>Volume</span></div>
     <a class="row" href="#photo" data-key="photo"><span class="row__n mono">01</span><span class="row__t">Photography</span><span class="row__d">AtleticProgettoMontagna · Felina F.C. · Portraits</span><span class="row__c mono">{total} photos</span></a>
     <a class="row" href="#graphics" data-key="graphics"><span class="row__n mono">02</span><span class="row__t">Graphic design</span><span class="row__d">APM match posters · Dsgn.pop</span><span class="row__c mono">{len(graphics)} posts</span></a>
-    <a class="row" href="#web" data-key="web"><span class="row__n mono">03</span><span class="row__t">Web design</span><span class="row__d">AtleticProgettoMontagna · AGLF · Castelnovo ne’ Monti · Casina · Villa Minozzo</span><span class="row__c mono">5 sites</span></a>
+    <a class="row" href="#video" data-key="video"><span class="row__n mono">03</span><span class="row__t">Video editing</span><span class="row__d">Short-form edits · Content creation</span><span class="row__c mono">@that.one.film</span></a>
+    <a class="row" href="#web" data-key="web"><span class="row__n mono">04</span><span class="row__t">Web design</span><span class="row__d">AtleticProgettoMontagna · AGLF · Castelnovo ne’ Monti · Casina · Villa Minozzo</span><span class="row__c mono">5 sites</span></a>
   </section>
 
   <section class="chapter" id="photo" aria-labelledby="photo-title">
@@ -173,6 +183,17 @@ html = f"""<!doctype html>
         {posters}
     </div>
     <p class="posters__follow"><a class="mono ulink" href="{IG}" target="_blank" rel="noopener">Follow @dsgn.pop {ARROW}</a></p>
+  </section>
+
+  <section class="chapter" id="video" aria-labelledby="video-title">
+    <header class="chapter__head rv">
+      <h2 class="chapter__title" id="video-title">Video <span class="serif">editing</span></h2>
+      <p class="chapter__lede">Short-form edits and personal content: fast cuts, music-driven pacing, <strong>stories told in a few seconds</strong>. New projects are on the way — meanwhile, my own work lives on TikTok.</p>
+    </header>
+    {tt_block}<div class="reel rv">
+      <a class="reel__link" href="{TIKTOK}" target="_blank" rel="noopener"><span class="mono dim">TikTok</span><span class="reel__handle">@that.one.film</span><span class="reel__arrow" aria-hidden="true">↗</span></a>
+      <ul class="tools mono" aria-label="Toolkit"><li>DaVinci Resolve</li><li>Premiere Pro</li><li>CapCut</li><li>Filmora</li></ul>
+    </div>
   </section>
 
   <section class="chapter" id="web" aria-labelledby="web-title">
@@ -322,7 +343,7 @@ not_found = f"""<!doctype html>
 open(os.path.join(REPO, "404.html"), "w").write(not_found)
 
 # --- Vecchi indirizzi del sito a più pagine: portano alla sezione giusta
-for old, anchor in [("about", "about"), ("photo", "photo"), ("graphics", "graphics"), ("video", "services"),
+for old, anchor in [("about", "about"), ("photo", "photo"), ("graphics", "graphics"), ("video", "video"),
                     ("web-site", "web"), ("contact", "contact")]:
     os.makedirs(os.path.join(REPO, old), exist_ok=True)
     open(os.path.join(REPO, old, "index.html"), "w").write(f"""<!doctype html>
