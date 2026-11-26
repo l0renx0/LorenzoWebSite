@@ -4,7 +4,7 @@ Uso: python3 _build/build.py
 Testi e immagini della pagina sono in questo file; lo stile in assets/css/style.css,
 le interazioni in assets/js/main.js.
 """
-import json, os
+import json, os, re
 from PIL import Image
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -25,11 +25,34 @@ def src(f):
     return "assets/img/" + f
 
 
-def img(f, alt, lazy=True, extra=""):
+OPT = os.path.join(REPO, "assets", "img", "opt")
+SMALL = 400   # larghezza della versione leggera usata nelle griglie
+
+
+def webp(f, width):
+    """Crea (una volta sola) la versione WebP dell'immagine alla larghezza indicata."""
+    os.makedirs(OPT, exist_ok=True)
+    name = f"{os.path.splitext(f)[0]}-{width}.webp"
+    out = os.path.join(OPT, name)
+    if not os.path.exists(out):
+        im = Image.open(os.path.join(REPO, src(f)))
+        im = im.convert("RGBA" if im.mode in ("RGBA", "LA", "P") else "RGB")
+        if im.width > width:
+            im = im.resize((width, round(im.height * width / im.width)), Image.LANCZOS)
+        im.save(out, "WEBP", quality=80, method=6)
+    return "assets/img/opt/" + name
+
+
+def img(f, alt, lazy=True, extra="", sizes="100vw"):
     path = os.path.join(REPO, src(f))
     w, h = Image.open(path).size
-    l = ' loading="lazy" decoding="async"' if lazy else ""
-    return f'<img src="{src(f)}" alt="{alt}" width="{w}" height="{h}"{l}{extra}>'
+    full = min(w, 1600)
+    variants = [(webp(f, SMALL), SMALL)] if w > SMALL * 1.3 else []
+    variants.append((webp(f, full), full))
+    srcset = ", ".join(f"{u} {vw}w" for u, vw in variants)
+    l = ' loading="lazy" decoding="async"' if lazy else ' fetchpriority="high"'
+    return (f'<img src="{src(f)}" srcset="{srcset}" sizes="{sizes}" data-full="{variants[-1][0]}" '
+            f'alt="{alt}" width="{w}" height="{h}"{l}{extra}>')
 
 
 def series(y):
@@ -44,6 +67,7 @@ web = [x["file"] for x in M["web_site_d"]]
 about = [x["file"] for x in M["about_d"]]
 
 # --- Galleria foto
+G_SIZES = "(max-width: 560px) 50vw, (max-width: 1100px) 33vw, 25vw"
 SERIES = {"apm": ("AtleticProgettoMontagna", apm), "felina": ("Felina F.C.", felina), "portraits": ("Portraits", portraits)}
 # Le 12 foto della vista iniziale (indice nella serie), in quest'ordine
 PICKS = [("felina", 3), ("apm", 5), ("portraits", 0), ("apm", 6), ("felina", 1), ("portraits", 5),
@@ -53,13 +77,13 @@ figs = []
 for key, i in order:
     label, files = SERIES[key]
     pick = "1" if (key, i) in PICKS else "0"
-    figs.append(f'<figure data-series="{key}" data-pick="{pick}" tabindex="0">{img(files[i], f"{label} — photo {i+1}")}<figcaption class="mono">{label}</figcaption></figure>')
+    figs.append(f'<figure data-series="{key}" data-pick="{pick}" tabindex="0">{img(files[i], f"{label} — photo {i+1}", sizes=G_SIZES)}<figcaption class="mono">{label}</figcaption></figure>')
 gallery = "\n        ".join(figs)
 total = len(apm) + len(felina) + len(portraits)
 
 # --- Poster
 posters = "\n        ".join(
-    f'<figure class="poster">{img(f, f"Graphic post {i+1:02d}")}</figure>'
+    f'<figure class="poster">{img(f, f"Graphic post {i+1:02d}", sizes="(max-width: 560px) 50vw, (max-width: 900px) 33vw, 20vw")}</figure>'
     for i, f in enumerate(graphics))
 
 # --- Video da TikTok: incolla qui gli ID (il numero finale dei link tiktok.com/@that.one.film/video/ID)
@@ -73,7 +97,7 @@ tt_block = f'<div class="clips rv">\n        {tt_videos}\n    </div>\n' if TIKTO
 # --- Browser
 def browser(f, url, name, href):
     return (f'<figure class="browser rv"><div class="browser__bar"><span class="browser__dots"><i></i><i></i><i></i></span>'
-            f'<span class="browser__url mono">{url}</span></div>{img(f, name + " website")}'
+            f'<span class="browser__url mono">{url}</span></div>{img(f, name + " website", sizes="(max-width: 900px) 100vw, 50vw")}'
             f'<figcaption><span>{name}</span><a class="mono ulink" href="{href}" target="_blank" rel="noopener">Visit {ARROW}</a></figcaption></figure>')
 browsers = "\n        ".join([
     browser("web-apm.jpg", "atleticprogettomontagna.it", "AtleticProgettoMontagna", "https://www.atleticprogettomontagna.it"),
@@ -95,7 +119,10 @@ html = f"""<!doctype html>
 <meta property="og:type" content="website">
 <meta property="og:title" content="Lorenzo Devicienti">
 <meta property="og:description" content="Photography, graphic design, video editing and websites, based in Barcelona.">
-<meta property="og:image" content="{SITE}assets/img/og-image.jpg">
+<meta property="og:image" content="{SITE}assets/img/og-image.jpg?v=2">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="“To get something you don’t have, you have to do something you’ve never done before.” A quote by Mirko Martorana. Lorenzo Devicienti.">
 <meta property="og:url" content="@@CANON@@">
 <meta property="og:locale" content="@@LOCALE@@">
 <meta name="twitter:card" content="summary_large_image">
@@ -106,8 +133,10 @@ html = f"""<!doctype html>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/style.css">
 <script src="assets/js/main.js" defer></script>
+@@JSONLD@@
 </head>
 <body>
+<a class="skip" href="#top">Skip to content</a>
 <header class="bar">
   <a class="bar__name" href="#top">Lorenzo Devicienti</a>
   <nav class="bar__nav mono" aria-label="Main">
@@ -211,7 +240,7 @@ html = f"""<!doctype html>
       <h2 class="chapter__title" id="about-title">The <span class="serif">story</span></h2>
     </header>
     <div class="about">
-      <figure class="about__photo rv">{img(about[0], "Lorenzo on graduation day, wearing a laurel wreath")}<figcaption class="mono dim">Graduation day — Reggio Emilia</figcaption></figure>
+      <figure class="about__photo rv">{img(about[0], "Lorenzo on graduation day, wearing a laurel wreath", sizes="(max-width: 900px) 420px, 33vw")}<figcaption class="mono dim">Graduation day — Reggio Emilia</figcaption></figure>
       <div class="about__body">
         <p class="about__big rv">At 18 I didn’t know what to do with my life. I only knew technology had always been part of it — <em>and probably always will be.</em></p>
         <ol class="timeline">
@@ -269,6 +298,17 @@ html = f"""<!doctype html>
 """
 from i18n import LANGS, MOTTO, JS, translate
 
+# Dati strutturati per i motori di ricerca (schema.org Person)
+JSONLD = '<script type="application/ld+json">' + json.dumps({
+    "@context": "https://schema.org", "@type": "Person", "name": "Lorenzo Devicienti", "url": SITE,
+    "image": SITE + "assets/img/og-image.jpg",
+    "jobTitle": "Photographer, graphic designer, video editor and web designer",
+    "address": {"@type": "PostalAddress", "addressLocality": "Barcelona", "addressCountry": "ES"},
+    "alumniOf": {"@type": "CollegeOrUniversity", "name": "Università di Modena e Reggio Emilia"},
+    "knowsAbout": ["Photography", "Graphic design", "Video editing", "Web design", "Social media"],
+    "sameAs": [IG, IG_ME, LI, TIKTOK],
+}, ensure_ascii=False) + "</script>"
+
 LOCALES = {"en": "en_GB", "it": "it_IT", "es": "es_ES"}
 
 
@@ -295,12 +335,26 @@ for lang, info in LANGS.items():
     hreflang += f'\n<link rel="alternate" hreflang="x-default" href="{SITE}">'
     jsdata = " ".join(f'data-t-{k}="{v}"' for k, v in JS[lang].items())
     page = (page.replace("@@MOTTO@@", motto_html(lang)).replace("@@LANG@@", switch).replace("@@HREFLANG@@", hreflang)
-                .replace("@@HTMLLANG@@", lang).replace("@@JSDATA@@", jsdata)
+                .replace("@@HTMLLANG@@", lang).replace("@@JSONLD@@", JSONLD).replace("@@JSDATA@@", jsdata)
                 .replace("@@CANON@@", SITE + info["path"]).replace("@@LOCALE@@", LOCALES[lang]))
     if up:
-        page = page.replace('href="assets/', 'href="../assets/').replace('src="assets/', 'src="../assets/')
+        page = re.sub(r'(?<=["\s,])assets/', '../assets/', page)
     os.makedirs(os.path.join(REPO, info["path"]), exist_ok=True)
     open(os.path.join(REPO, info["path"], "index.html"), "w").write(page)
+
+# --- Sitemap (da inviare a Google Search Console)
+import datetime
+today = datetime.date.today().isoformat()
+alts = "".join(f'\n    <xhtml:link rel="alternate" hreflang="{c}" href="{SITE}{o["path"]}"/>' for c, o in LANGS.items())
+urls = "".join(f"""
+  <url>
+    <loc>{SITE}{o["path"]}</loc>
+    <lastmod>{today}</lastmod>{alts}
+  </url>""" for o in LANGS.values())
+open(os.path.join(REPO, "sitemap.xml"), "w").write(f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">{urls}
+</urlset>
+""")
 
 # --- Pagina 404 (indirizzi assoluti: viene servita su qualunque percorso)
 BASE = "/LorenzoWebSite/"

@@ -10,7 +10,8 @@
   --paper-2: #161615;
   --ink: #edece7;
   --ink-2: #a3a199;
-  --ink-3: #64625c;
+  --ink-3: #807e77;  /* testi piccoli: contrasto AA */
+  --ink-4: #64625c;  /* solo decorazione (righe chiare del motto) */
   --line: rgba(237, 236, 231, .13);
   --signal: #4b5cff;
   --shadow: rgba(0, 0, 0, .6);
@@ -28,7 +29,7 @@
 }
 
 :root[data-theme="light"] {
-  --paper: #eeefec; --paper-2: #e2e3df; --ink: #111110; --ink-2: #5d5b56; --ink-3: #8f8c84;
+  --paper: #eeefec; --paper-2: #e2e3df; --ink: #111110; --ink-2: #5d5b56; --ink-3: #6b6862; --ink-4: #8f8c84;
   --line: rgba(17, 17, 16, .14); --signal: #2b3dff; --shadow: rgba(0, 0, 0, .35); color-scheme: light;
 }
 
@@ -365,7 +366,7 @@ body::after {
 .motto__text { font-weight: 800; text-transform: uppercase; line-height: .8; letter-spacing: -.005em; margin: 0; }
 .motto__line { display: block; white-space: nowrap; overflow: clip; overflow-clip-margin: .08em; padding-top: .045em; font-size: var(--fs, 9.6vw); font-stretch: var(--wd, 100%); }
 .motto__line > .in { display: inline-block; }
-.motto__line--dim { color: var(--ink-3); }
+.motto__line--dim { color: var(--ink-4); }
 .motto__line--accent { color: var(--signal); }
 .motto .ch { display: inline-block; white-space: pre; animation: rise 1.1s var(--ease) both; animation-delay: calc(var(--i) * 14ms + 100ms); }
 .motto__foot {
@@ -607,3 +608,8 @@ h1.motto__intro strong { font-weight: 700; color: var(--ink); }
 .clip { aspect-ratio: 9 / 16; border-radius: 18px; overflow: hidden; background: var(--paper-2); }
 .clip iframe { width: 100%; height: 100%; border: 0; display: block; }
 @media (max-width: 900px) { .clips { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* Link per saltare al contenuto (tastiera e lettori di schermo) */
+.skip { position: fixed; top: 10px; left: 10px; z-index: 1000; padding: 10px 14px; background: var(--ink); color: var(--paper); border-radius: 8px; transform: translateY(-160%); transition: transform .2s; }
+.skip:focus-visible { transform: none; }
+.gallery figcaption { max-width: calc(100% - 20px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
