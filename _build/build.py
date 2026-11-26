@@ -62,16 +62,13 @@ posters = "\n        ".join(
     f'<figure class="poster">{img(f, f"Graphic post {i+1:02d}")}</figure>'
     for i, f in enumerate(graphics))
 
-# --- Post da TikTok (@that.one.film): ("video" | "photo", ID). L'ID è il numero finale del link
-#     tiktok.com/@that.one.film/video/ID oppure /photo/ID (i caroselli).
-TIKTOK_POSTS = [("photo", "7691425132136385825"), ("photo", "7641925220240035104")]
-def tt_embed(kind, v, i):
-    src = (f"https://www.tiktok.com/player/v1/{v}?description=0&music_info=0&rel=0" if kind == "video"
-           else f"https://www.tiktok.com/embed/v2/{v}")
-    return (f'<figure class="clip clip--{kind}"><iframe src="{src}" title="TikTok post {i+1} by @that.one.film" '
-            f'loading="lazy" allow="fullscreen; encrypted-media" allowfullscreen></iframe></figure>')
-tt_videos = "\n        ".join(tt_embed(k, v, i) for i, (k, v) in enumerate(TIKTOK_POSTS))
-tt_block = f'<div class="clips rv">\n        {tt_videos}\n    </div>\n    ' if TIKTOK_POSTS else ""
+# --- Video da TikTok: incolla qui gli ID (il numero finale dei link tiktok.com/@that.one.film/video/ID)
+TIKTOK_VIDEOS = []
+tt_videos = "\n        ".join(
+    f'<figure class="clip"><iframe src="https://www.tiktok.com/player/v1/{v}?description=0&music_info=0&rel=0" '
+    f'title="TikTok video {i+1}" loading="lazy" allow="fullscreen; encrypted-media" allowfullscreen></iframe></figure>'
+    for i, v in enumerate(TIKTOK_VIDEOS))
+tt_block = f'<div class="clips rv">\n        {tt_videos}\n    </div>\n' if TIKTOK_VIDEOS else ""
 
 # --- Browser
 def browser(f, url, name, href):
@@ -191,7 +188,7 @@ html = f"""<!doctype html>
   <section class="chapter" id="video" aria-labelledby="video-title">
     <header class="chapter__head rv">
       <h2 class="chapter__title" id="video-title">Video <span class="serif">editing</span></h2>
-      <p class="chapter__lede">Short videos and carousels for <strong>That One Film</strong>, my page about movies and TV series: fast cuts, music-driven pacing, stories told in a few seconds. Here are the posts that performed best.</p>
+      <p class="chapter__lede">Short-form edits and personal content: fast cuts, music-driven pacing, <strong>stories told in a few seconds</strong>. New projects are on the way — meanwhile, my own work lives on TikTok.</p>
     </header>
     {tt_block}<div class="reel rv">
       <a class="reel__link" href="{TIKTOK}" target="_blank" rel="noopener"><span class="mono dim">TikTok</span><span class="reel__handle">@that.one.film</span><span class="reel__arrow" aria-hidden="true">↗</span></a>
