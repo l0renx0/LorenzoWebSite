@@ -62,13 +62,6 @@ posters = "\n        ".join(
     f'<figure class="poster">{img(f, f"Graphic post {i+1:02d}")}</figure>'
     for i, f in enumerate(graphics))
 
-# --- Telefoni
-phones = "\n        ".join(f'<figure class="phone">{img(f, a)}</figure>' for f, a in [
-    ("vid-goal.jpg", "Edit frame: “Goal” title over Marcus Thuram"),
-    ("vid-tutu.jpg", "Edit frame: “Tu-Tu” title with the player on a yellow background"),
-    ("vid-celebration.jpg", "Edit frame: team celebration"),
-    ("vid-thuram.jpg", "Edit frame: “Thuram” title in the stadium at night")])
-
 # --- Browser
 def browser(f, url, name, href):
     return (f'<figure class="browser rv"><div class="browser__bar"><span class="browser__dots"><i></i><i></i><i></i></span>'
@@ -123,11 +116,10 @@ html = f"""<!doctype html>
   <ol class="menu__list">
     <li><a href="#photo"><span class="mono">01</span>Photography</a></li>
     <li><a href="#graphics"><span class="mono">02</span>Graphic design</a></li>
-    <li><a href="#video"><span class="mono">03</span>Video editing</a></li>
-    <li><a href="#web"><span class="mono">04</span>Websites</a></li>
-    <li><a href="#about"><span class="mono">05</span>About</a></li>
-    <li><a href="#services"><span class="mono">06</span>Services</a></li>
-    <li><a href="#contact"><span class="mono">07</span>Contact</a></li>
+    <li><a href="#web"><span class="mono">03</span>Websites</a></li>
+    <li><a href="#about"><span class="mono">04</span>About</a></li>
+    <li><a href="#services"><span class="mono">05</span>Services</a></li>
+    <li><a href="#contact"><span class="mono">06</span>Contact</a></li>
   </ol>
   <div class="menu__foot mono">
     <a href="{IG}" target="_blank" rel="noopener">Dsgn.pop</a>
@@ -151,8 +143,7 @@ html = f"""<!doctype html>
     <div class="index__head mono dim" aria-hidden="true"><span>No.</span><span>Discipline</span><span>Highlights</span><span>Volume</span></div>
     <a class="row" href="#photo" data-key="photo"><span class="row__n mono">01</span><span class="row__t">Photography</span><span class="row__d">AtleticProgettoMontagna · Felina F.C. · Portraits</span><span class="row__c mono">{total} photos</span></a>
     <a class="row" href="#graphics" data-key="graphics"><span class="row__n mono">02</span><span class="row__t">Graphic design</span><span class="row__d">APM match posters · Dsgn.pop</span><span class="row__c mono">{len(graphics)} posts</span></a>
-    <a class="row" href="#video" data-key="video"><span class="row__n mono">03</span><span class="row__t">Video editing</span><span class="row__d">Marcus Thuram — short-form edit</span><span class="row__c mono">TikTok-first</span></a>
-    <a class="row" href="#web" data-key="web"><span class="row__n mono">04</span><span class="row__t">Web design</span><span class="row__d">AtleticProgettoMontagna · AGLF · Castelnovo ne’ Monti · Casina · Villa Minozzo</span><span class="row__c mono">5 sites</span></a>
+    <a class="row" href="#web" data-key="web"><span class="row__n mono">03</span><span class="row__t">Web design</span><span class="row__d">AtleticProgettoMontagna · AGLF · Castelnovo ne’ Monti · Casina · Villa Minozzo</span><span class="row__c mono">5 sites</span></a>
   </section>
 
   <section class="chapter" id="photo" aria-labelledby="photo-title">
@@ -181,24 +172,6 @@ html = f"""<!doctype html>
         {posters}
     </div>
     <p class="posters__follow"><a class="mono ulink" href="{IG}" target="_blank" rel="noopener">Follow @dsgn.pop {ARROW}</a></p>
-  </section>
-
-  <section class="chapter" id="video" aria-labelledby="video-title">
-    <header class="chapter__head rv">
-      <h2 class="chapter__title" id="video-title">Built on <span class="serif">rhythm</span></h2>
-      <p class="chapter__lede">Crafted for visual impact. Short-form edits where fast cuts, beat-driven transitions and pacing turn <strong>performance into emotion</strong>.</p>
-    </header>
-    <div class="phones rv">
-        {phones}
-    </div>
-    <div class="video-notes rv">
-      <p>A short-form edit dedicated to Marcus Thuram: athletic movement, presence and character, translated into a visually engaging story built for social platforms. <span class="dim">Where motion meets identity.</span></p>
-      <div>
-        <p class="mono">Toolkit</p>
-        <ul class="tools mono"><li>Filmora</li><li>DaVinci Resolve</li><li>Premiere Pro</li><li>CapCut</li><li>Procreate</li></ul>
-        <p style="margin-top:24px"><a class="mono ulink" href="{TIKTOK}" target="_blank" rel="noopener">Watch on TikTok {ARROW}</a></p>
-      </div>
-    </div>
   </section>
 
   <section class="chapter" id="web" aria-labelledby="web-title">
@@ -348,7 +321,7 @@ not_found = f"""<!doctype html>
 open(os.path.join(REPO, "404.html"), "w").write(not_found)
 
 # --- Vecchi indirizzi del sito a più pagine: portano alla sezione giusta
-for old, anchor in [("about", "about"), ("photo", "photo"), ("graphics", "graphics"), ("video", "video"),
+for old, anchor in [("about", "about"), ("photo", "photo"), ("graphics", "graphics"), ("video", "services"),
                     ("web-site", "web"), ("contact", "contact")]:
     os.makedirs(os.path.join(REPO, old), exist_ok=True)
     open(os.path.join(REPO, old, "index.html"), "w").write(f"""<!doctype html>
