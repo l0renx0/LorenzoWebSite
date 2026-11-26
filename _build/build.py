@@ -14,7 +14,7 @@ M = json.load(open(os.path.join(HERE, "manifest.json")))
 IG = "https://www.instagram.com/dsgn.pop/"
 IG_ME = "https://www.instagram.com/l0renx0/"
 LI = "https://www.linkedin.com/in/lorenzo-devicienti-5a5669278/"
-TIKTOK = "https://vm.tiktok.com/ZNRYW8jPm/"
+TIKTOK = "https://www.tiktok.com/@that.one.film"
 ARROW = '<svg width="11" height="11" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 11 11 3M4.5 3H11v6.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>'
 
 
@@ -125,6 +125,7 @@ html = f"""<!doctype html>
     <a href="{IG}" target="_blank" rel="noopener">Dsgn.pop</a>
     <a href="{IG_ME}" target="_blank" rel="noopener">Instagram</a>
     <a href="{LI}" target="_blank" rel="noopener">LinkedIn</a>
+    <a href="{TIKTOK}" target="_blank" rel="noopener">TikTok</a>
     <button class="menu__theme" type="button" data-theme-toggle><svg width="16" height="16" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="6" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M7 1a6 6 0 0 1 0 12z" fill="currentColor"/></svg></button>
   </div>
 </nav>
@@ -211,7 +212,7 @@ html = f"""<!doctype html>
     <div class="services rv">
       <div class="service"><p class="mono dim">01</p><h3>Shooting</h3><ul><li>Photo shoots</li><li>Post-production</li><li>Publishing advice</li></ul></div>
       <div class="service"><p class="mono dim">02</p><h3>Design</h3><ul><li>Posters</li><li>Interfaces</li><li>Presentations</li><li>Carousels</li></ul></div>
-      <div class="service"><p class="mono dim">03</p><h3>Video editing</h3><ul><li>Video production</li><li>Post-production</li><li>Publishing advice</li></ul></div>
+      <div class="service"><p class="mono dim">03</p><h3>Video</h3><ul><li>Short-form editing</li><li>Content creation</li><li>Post-production</li></ul><p class="service__link"><a class="mono ulink" href="{TIKTOK}" target="_blank" rel="noopener">See it on TikTok {ARROW}</a></p></div>
       <div class="service"><p class="mono dim">04</p><h3>Websites</h3><ul><li>UX/UI design</li><li>Figma &amp; Framer</li><li>WordPress</li></ul></div>
     </div>
   </section>
@@ -226,7 +227,7 @@ html = f"""<!doctype html>
     <div class="contact__grid">
       <div><span class="mono">Phone</span><a class="ulink" href="tel:+393337111353">+39 333 711 1353</a></div>
       <div><span class="mono">Based in</span>Carrer de Londres, 23<br>Barcelona</div>
-      <div><span class="mono">Elsewhere</span><a class="ulink" href="{IG}" target="_blank" rel="noopener">Dsgn.pop</a><br><a class="ulink" href="{IG_ME}" target="_blank" rel="noopener">Instagram</a><br><a class="ulink" href="{LI}" target="_blank" rel="noopener">LinkedIn</a></div>
+      <div><span class="mono">Elsewhere</span><a class="ulink" href="{IG}" target="_blank" rel="noopener">Dsgn.pop</a><br><a class="ulink" href="{IG_ME}" target="_blank" rel="noopener">Instagram</a><br><a class="ulink" href="{LI}" target="_blank" rel="noopener">LinkedIn</a><br><a class="ulink" href="{TIKTOK}" target="_blank" rel="noopener">TikTok</a></div>
       <div><span class="mono">© <span data-year>2026</span></span>Lorenzo Devicienti<br><a class="ulink" href="#top">Back to top ↑</a></div>
     </div>
   </section>

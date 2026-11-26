@@ -589,3 +589,6 @@ h1.motto__intro strong { font-weight: 700; color: var(--ink); }
 /* 10 poster: 5 colonne (2 righe piene) oppure 2 colonne (5 righe piene), mai righe a metà */
 @media (max-width: 1100px) { .posters { grid-template-columns: repeat(5, 1fr); } }
 @media (max-width: 760px) { .posters { grid-template-columns: repeat(2, 1fr); } }
+
+/* Link sotto un servizio (TikTok) */
+.service__link { margin-top: 20px; }
